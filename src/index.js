@@ -1,0 +1,18 @@
+/*
+  index.js - React 애플리케이션의 진입점
+  - `App.js`를 `index.html`의 `root`에 렌더링하는 역할
+  - 글로벌 스타일 `common.css` 적용
+*/
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./styles/common.css"; // 글로벌 스타일 적용
+
+// React 애플리케이션을 #root 요소에 렌더링
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
