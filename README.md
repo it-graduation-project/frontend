@@ -1,70 +1,24 @@
-# Getting Started with Create React App
+# 🚀 Git 브랜치 전략 및 작업 가이드
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 1️⃣ 브랜치 구조
+각 브랜치는 아래와 같이 관리합니다.
 
-## Available Scripts
+| 브랜치 유형  | 브랜치 이름 예시       | 설명 |
+|-------------|----------------|----------------------------------|
+| **메인 (배포)**  | `main`         | 🚀 최종 배포 브랜치 (**직접 작업 금지**) |
+| **개발 (통합)**  | `dev`          | 🛠 기능 개발이 모이는 브랜치 |
+| **기능 개발**  | `feature/기능명` | 각자 개발할 기능별 브랜치 (예: `feature/login`) |
+| **버그 수정**  | `fix/버그명`    | 특정 버그 수정 브랜치 (예: `fix/upload-error`) |
 
-In the project directory, you can run:
+✅ **기능 개발은 `dev`에서 새로운 브랜치를 만들어 진행**  
+✅ **기능이 완성되면 PR(Pull Request) 생성 후 `dev`에 머지**  
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 2️⃣ 브랜치 생성 및 작업 흐름
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### 📌 기능 개발 시 브랜치 생성
+```bash
+git checkout dev  # 항상 dev에서 브랜치를 만든다
+git pull origin dev  # 최신 코드 가져오기
+git checkout -b feature/기능명  # 새 기능 브랜치 생성
