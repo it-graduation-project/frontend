@@ -108,10 +108,10 @@ const SignupPopup = ({ isOpen, onClose, onLoginOpen }) => {
             required
           />
           <div className="popup-footer">
-            <button type="submit" className="popup-login-btn full-width">Sign Up</button>
+            <button type="submit" className="popup-submit-btn full-width">Sign Up</button>
           </div>
         </form>
-        <p className="popup-signup">
+        <p className="popup-note">
           Already have an account?<br />
           <a href="#" onClick={onLoginOpen}>Login</a>
         </p>
