@@ -46,10 +46,12 @@
   background: none;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
+  color: #6c6c6c;
 }
 
 .popup-close:hover {
   transform: scale(1.2);
+  color: #000000;
 }
 
 .popup-label {
