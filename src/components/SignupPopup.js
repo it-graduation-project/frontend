@@ -3,7 +3,7 @@
   - 사용자가 새 계정을 생성할 수 있음
 */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Popup.css"; // 공통 팝업 스타일
 
 const SignupPopup = ({ isOpen, onClose, onLoginOpen }) => {
@@ -12,6 +12,17 @@ const SignupPopup = ({ isOpen, onClose, onLoginOpen }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+
+  // 팝업이 닫힐 때 입력값 초기화
+  useEffect(() => {
+    if (!isOpen) {
+      setName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setError("");
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null; // 팝업이 닫혀있으면 렌더링 X
 
@@ -25,17 +36,17 @@ const SignupPopup = ({ isOpen, onClose, onLoginOpen }) => {
     }
 
     try {
-      const response = await fetch("http://13.209.19.98:8080/auth/register", {  // 💡 AWS 서버 주소 사용
+      const response = await fetch("http://13.209.19.98:8080/auth/register", {  // AWS 서버 주소 사용
         method: "POST",
-        headers: { "Content-Type": "application/json" },  // 💡 JSON 형식으로 변경
-        body: JSON.stringify({ email, password, username }),  // 💡 username 추가
+        headers: { "Content-Type": "application/json" },  
+        body: JSON.stringify({ email, password, username }),  
       });
 
-      const data = await response.json();  // 💡 JSON 응답 처리
+      const data = await response.json();  
       console.log("Signup Response:", data);
 
       if (response.ok) {
-        if (data.message === "User registered successfully") {  // 💡 성공 응답 메시지 확인
+        if (data.message === "User registered successfully") { 
           alert("Registration successful! Please log in.");
           onClose();
           onLoginOpen(); // 회원가입 후 로그인 팝업 열기
