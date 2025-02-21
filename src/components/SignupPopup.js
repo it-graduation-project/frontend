@@ -25,7 +25,7 @@ const SignupPopup = ({ isOpen, onClose, onLoginOpen }) => {
     }
 
     try {
-      const response = await fetch("http://13.124.228.23:8080/auth/register", {  // 💡 AWS 서버 주소 사용
+      const response = await fetch("http://13.209.19.98:8080/auth/register", {  // 💡 AWS 서버 주소 사용
         method: "POST",
         headers: { "Content-Type": "application/json" },  // 💡 JSON 형식으로 변경
         body: JSON.stringify({ email, password, username }),  // 💡 username 추가

@@ -8,16 +8,18 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Navbar.css";
 import logoImage from "../images/logo.png";
-import LoginPopup from "./LoginPopup"; // 🔥 LoginPopup import 추가
+import LoginPopup from "./LoginPopup"; 
+import SignupPopup from "./SignupPopup";
 
 const Navbar = () => {
   const [userInfo, setUserInfo] = useState(null);
-  const [isLoginPopupOpen, setLoginPopupOpen] = useState(false); // 🔥 로그인 팝업 상태 추가
+  const [isLoginPopupOpen, setLoginPopupOpen] = useState(false); 
+  const [isSignupPopupOpen, setSignupPopupOpen] = useState(false);
 
   // 💡 사용자 정보 요청 (로그인 상태 유지)
   const fetchUserInfo = async (token) => {
     try {
-      const response = await fetch("http://13.124.228.23:8080/auth/me", {
+      const response = await fetch("http://13.209.19.98:8080/auth/me", {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -25,6 +27,8 @@ const Navbar = () => {
       });
 
       const data = await response.json();
+      console.log("🔍 User Info Response:", data); // ✅ 응답 데이터 확인
+
       if (response.ok) {
         setUserInfo({ email: data.email, username: data.username });  // 💡 사용자 정보 저장
       } else {
@@ -76,7 +80,7 @@ const Navbar = () => {
               <button className="logout-btn" onClick={handleLogout}>Logout</button>
             </div>
           ) : (
-            <button className="login-btn" onClick={() => setLoginPopupOpen(true)}>Login</button> // 🔥 Login 버튼 클릭 시 팝업 열기
+            <button className="login-btn" onClick={() => setLoginPopupOpen(true)}>Login</button> 
           )}
         </div>
       </header>
@@ -86,8 +90,20 @@ const Navbar = () => {
       <LoginPopup 
         isOpen={isLoginPopupOpen} 
         onClose={() => setLoginPopupOpen(false)}
-        onSignupOpen={() => {}} 
+        onSignupOpen={() => { 
+          setLoginPopupOpen(false); 
+          setSignupPopupOpen(true); 
+        }} 
         onLoginSuccess={onLoginSuccess} 
+      />
+
+      <SignupPopup 
+        isOpen={isSignupPopupOpen} 
+        onClose={() => setSignupPopupOpen(false)}
+        onLoginOpen={() => { 
+          setSignupPopupOpen(false); 
+          setLoginPopupOpen(true); 
+        }} 
       />
     </>
   );

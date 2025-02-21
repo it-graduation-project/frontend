@@ -34,7 +34,7 @@ const FileUpload = ({ onFileUpload }) => {
 
     try {
       // console.log("🔑 업로드 시 사용할 토큰:", token); // 🔥 토큰 출력해서 확인
-      const response = await fetch("http://13.124.228.23:8080/files", {
+      const response = await fetch("http://13.209.19.98:8080/files", {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` },
         body: formData,

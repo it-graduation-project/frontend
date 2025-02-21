@@ -18,7 +18,7 @@ const LoginPopup = ({ isOpen, onClose, onSignupOpen, onLoginSuccess }) => {
     setError("");
 
     try {
-      const response = await fetch("http://13.124.228.23:8080/auth/login", {  // 💡 AWS 서버 주소 사용
+      const response = await fetch("http://13.209.19.98:8080/auth/login", {  // 💡 AWS 서버 주소 사용
         method: "POST",
         headers: { "Content-Type": "application/json" },  
         body: JSON.stringify({ email, password }),  
