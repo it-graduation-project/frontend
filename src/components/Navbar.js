@@ -76,7 +76,9 @@ const Navbar = () => {
         <div className="navbar-right">
           {userInfo ? (
             <div className="user-info">
-              <span className="welcome-text">{userInfo.username}님 환영합니다!</span>
+              <span className="welcome-text">
+                Welcome, <span className="username">{userInfo.username}</span>
+              </span>
               <button className="logout-btn" onClick={handleLogout}>Logout</button>
             </div>
           ) : (
