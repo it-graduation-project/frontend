@@ -192,7 +192,7 @@ function animate() {
             console.warn("⚠️ FFT 값이 0입니다. 무음일 수 있습니다.");
         } else {
             uniforms.u_frequency.value = frequencyValue;
-            console.log(`🎵 FFT 주파수 값: ${frequencyValue}`);
+            // console.log(`🎵 FFT 주파수 값: ${frequencyValue}`);
         }
     }
 

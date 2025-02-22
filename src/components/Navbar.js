@@ -27,12 +27,19 @@ const Navbar = () => {
       });
 
       const data = await response.json();
-      console.log("🔍 User Info Response:", data); // ✅ 응답 데이터 확인
+      console.log("🔍 User Info Response:", data);
 
       if (response.ok) {
-        setUserInfo({ email: data.email, username: data.username });  // 💡 사용자 정보 저장
+        setUserInfo({ email: data.email, username: data.username });  
       } else {
         console.error("User info fetch failed:", data.message);
+
+        // ✅ JWT가 만료되었으면 자동 로그아웃
+        if (response.status === 401) {
+          console.log("🔴 JWT 만료됨, 로그아웃 처리");
+          localStorage.removeItem("jwtToken");
+          setUserInfo(null);
+        }
       }
     } catch (error) {
       console.error("Fetching user info failed:", error);
@@ -59,12 +66,19 @@ const Navbar = () => {
     }
   };
 
-  // 💡 로그아웃 기능 추가
+  // 💡 로그아웃 기능 수정 (localStorage.clear() 후 새로고침)
   const handleLogout = () => {
     console.log("🔴 Logging out...");
-    localStorage.removeItem("jwtToken");  // 🔥 JWT 토큰 삭제
-    setUserInfo(null);  // 🔥 상태 업데이트
-};
+
+    // 🔥 모든 저장된 데이터 삭제
+    localStorage.clear();
+
+    // 🔥 상태 초기화
+    setUserInfo(null);
+
+    // 🔥 페이지 새로고침하여 전체 상태 초기화
+    window.location.reload();
+  };
 
   return (
     <>
