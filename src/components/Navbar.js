@@ -48,14 +48,8 @@ const Navbar = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
-    if (token) {
-      fetchUserInfo(token);
-    }
-
-    return () => {
-      // 🔥 클린업 함수 추가 (메모리 누수 방지)
-      setUserInfo(null);
-    };
+    if (!token) return; // ✅ jwtToken이 없으면 fetchUserInfo() 호출 안 함
+    fetchUserInfo(token);
   }, []);
 
   // 🔥 로그인 성공 시 실행할 함수
