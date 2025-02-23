@@ -105,7 +105,6 @@ const FileUpload = ({ onFileUpload }) => {
         </button>
         <p className="upload-support">Supported formats: MP3, WAV, FLAC (Max 20MB)</p>
       </div>
-      {audioUrl && <audio controls src={audioUrl} className="audio-player" />}
       <div className="feature-cards">
           <div className="feature-card">
             <img src={frequencyIconImage} alt="Frequency Icon" className="feature-icon" />
