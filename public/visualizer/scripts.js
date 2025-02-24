@@ -157,7 +157,7 @@ window.onload = async function () {
         playPauseButton.style.backgroundColor = "#28a745";
         playPauseButton.style.cursor = "pointer";
 
-        let audioContextStartTime = 0; // 🔹 오디오 재생 시작 시간
+        let audioContextStartTime = 0; // 오디오 재생 시작 시간
 
         playPauseButton.addEventListener("click", () => {
             if (!isPlaying) {
@@ -169,11 +169,10 @@ window.onload = async function () {
                         audioContextStartTime = sound.context.currentTime - currentPlaybackTime;
                         console.log(`▶ 음악 재생 (이전 위치: ${currentPlaybackTime.toFixed(2)}초)`);
                         isPlaying = true;
-                        animate(); // ✅ 애니메이션 실행
+                        animate(); 
 
-                        // 🔄 버튼 상태 변경
                         playPauseButton.textContent = "Stop";
-                        playPauseButton.style.backgroundColor = "#dc3545"; // 🔴 빨강색 (정지)
+                        playPauseButton.style.backgroundColor = "#dc3545"; 
                     });
                 } else {
                     sound.offset = currentPlaybackTime;
@@ -181,11 +180,10 @@ window.onload = async function () {
                     audioContextStartTime = sound.context.currentTime - currentPlaybackTime;
                     console.log(`▶ 음악 재생 (이전 위치: ${currentPlaybackTime.toFixed(2)}초)`);
                     isPlaying = true;
-                    animate(); // ✅ 애니메이션 실행
+                    animate(); 
 
-                    // 🔄 버튼 상태 변경
                     playPauseButton.textContent = "Stop";
-                    playPauseButton.style.backgroundColor = "#dc3545"; // 🔴 빨강색 (정지)
+                    playPauseButton.style.backgroundColor = "#dc3545"; 
                 }
             } else {
                 // ■ 정지 모드
@@ -199,9 +197,9 @@ window.onload = async function () {
                     console.log("🎥 애니메이션 루프 종료!");
                 }
 
-                // 🔄 버튼 상태 변경
+                bloomComposer.render(); // 정지 후 마지막 프레임 유지
                 playPauseButton.textContent = "Play";
-                playPauseButton.style.backgroundColor = "#28a745"; // 🟢 초록색 (재생)
+                playPauseButton.style.backgroundColor = "#28a745"; 
             }
         });
     });
@@ -270,5 +268,8 @@ window.addEventListener('resize', function() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     bloomComposer.setSize(window.innerWidth, window.innerHeight);
 
-    // console.log(`📐 새로운 화면 크기 - 너비: ${window.innerWidth}, 높이: ${window.innerHeight}`);
+    if (!isPlaying) {
+        console.log("🖼️ 창 크기 변경 시 마지막 프레임 유지");
+        bloomComposer.render();
+    }
 });
