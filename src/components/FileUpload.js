@@ -12,13 +12,14 @@ import hapticIconImage from "../images/haptic-icon.png";
 
 const FileUpload = ({ onFileUpload }) => {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [isUploading, setIsUploading] = useState(false); // 업로드 진행 상태
+  const [isUploading, setIsUploading] = useState(false); 
   const [audioUrl, setAudioUrl] = useState(null);
+  const allowedExtensions = new Set(["mp3", "wav", "flac"]);
 
   const handleFileUpload = async (file) => {
     if (!file) return;
 
-    setIsUploading(true); // 업로드 시작
+    setIsUploading(true); 
     console.log("🔵 FileUpload.js - 파일 업로드 시작:", file.name); 
     const formData = new FormData();
     formData.append("file", file);
@@ -33,7 +34,7 @@ const FileUpload = ({ onFileUpload }) => {
     }
 
     try {
-      // console.log("🔑 업로드 시 사용할 토큰:", token); // 🔥 토큰 출력해서 확인
+      // console.log("🔑 업로드 시 사용할 토큰:", token); 
       const response = await fetch("http://13.209.19.98:8080/files", {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` },
@@ -47,7 +48,7 @@ const FileUpload = ({ onFileUpload }) => {
       if (!response.ok) {
           if (response.status === 403) {
               alert("🚨 Invalid token. Please log in again.");
-              localStorage.removeItem("jwtToken"); // 🔥 잘못된 토큰 제거
+              localStorage.removeItem("jwtToken"); 
           } else {
               alert(`🚨 Upload failed: ${responseText}`);
           }
@@ -88,8 +89,18 @@ const FileUpload = ({ onFileUpload }) => {
         className={`upload-box ${isDragOver ? "drag-over" : ""}`}
         onDrop={(e) => {
           e.preventDefault();
-          handleFileUpload(e.dataTransfer.files[0]);
           setIsDragOver(false);
+
+          const file = e.dataTransfer.files[0];
+
+          if (file) {
+            const fileExtension = file.name.split(".").pop().toLowerCase();
+            if (!allowedExtensions.has(fileExtension)) {
+              alert("🚨 Unsupported file type. Please upload MP3, WAV, or FLAC files.");
+              return;
+            }
+            handleFileUpload(file);
+          }
         }}
         onDragOver={(e) => {
           e.preventDefault();
@@ -100,10 +111,17 @@ const FileUpload = ({ onFileUpload }) => {
         <img src={uploadIconImage} alt="Upload Icon" className="upload-icon" />
         <h3>Drag and drop your audio file here</h3>
         <p>or</p>
-        <button className="browse-btn" onClick={() => document.getElementById("fileInput").click()}>
+        <button className="browse-btn" onClick={() => document.getElementById("uploadFileInput").click()}>
           Browse Files
         </button>
         <p className="upload-support">Supported formats: MP3, WAV, FLAC (Max 20MB)</p>
+        <input
+          type="file"
+          id="uploadFileInput"  
+          style={{ display: "none" }}
+          accept=".mp3,.wav,.flac"
+          // onChange={(e) => handleFileUpload(e.target.files[0])} 
+        />
       </div>
       <div className="feature-cards">
           <div className="feature-card">

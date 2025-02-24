@@ -18,15 +18,16 @@ const Hero = () => {
           Transform music into visual and tactile experiences. Our innovative
           technology helps the deaf community experience music in a whole new way.
         </p>
-        <button className="upload-btn" onClick={() => document.getElementById("fileInput").click()}>
+        <button className="upload-btn" onClick={() => document.getElementById("heroFileInput").click()}>
           <img src={musicIconImage} alt="Music Icon" className="music-icon" />
           Upload Music
         </button>
         <input
           type="file"
-          id="fileInput"
+          id="heroFileInput"  
           style={{ display: "none" }}
           accept=".mp3,.wav,.flac"
+          // onChange={(e) => handleFileUpload(e.target.files[0])}
         />
       </div>
       <img src={waveImage} alt="Wave Graphic" className="wave-graphic" />
