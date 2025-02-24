@@ -12,74 +12,7 @@ import hapticIconImage from "../images/haptic-icon.png";
 
 const FileUpload = ({ onFileUpload }) => {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [isUploading, setIsUploading] = useState(false); 
-  const [audioUrl, setAudioUrl] = useState(null);
   const allowedExtensions = new Set(["mp3", "wav", "flac"]);
-
-  const handleFileUpload = async (file) => {
-    if (!file) return;
-
-    setIsUploading(true); 
-    console.log("🔵 FileUpload.js - 파일 업로드 시작:", file.name); 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const token = localStorage.getItem("jwtToken");
-    console.log("🔑 사용자 토큰:", token);
-
-    if (!token) {
-        alert("Please login first.");
-        setIsUploading(false);
-        return;
-    }
-
-    try {
-      // console.log("🔑 업로드 시 사용할 토큰:", token); 
-      const response = await fetch("http://13.209.19.98:8080/files", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${token}` },
-        body: formData,
-        mode: "cors",
-      });
-
-      const responseText = await response.text();
-      console.log("🔴 서버 응답:", responseText);
-
-      if (!response.ok) {
-          if (response.status === 403) {
-              alert("🚨 Invalid token. Please log in again.");
-              localStorage.removeItem("jwtToken"); 
-          } else {
-              alert(`🚨 Upload failed: ${responseText}`);
-          }
-          setIsUploading(false);
-          return;
-      }
-
-      let data;
-      try {
-          data = JSON.parse(responseText);
-      } catch (error) {
-          console.error("🛑 JSON 파싱 오류:", error);
-          alert("🚨 Server error: Invalid response format.");
-          setIsUploading(false);
-          return;
-      }
-
-      if (data.fileUrl) {
-          console.log("🟢 FileUpload.js - 서버에서 받은 파일 URL:", data.fileUrl);
-          setAudioUrl(data.fileUrl);
-          onFileUpload(data.fileUrl);
-      } else {
-          console.error("🛑 FileUpload.js - 서버 응답 오류:", data);
-      }
-  } catch (error) {
-      console.error("🛑 FileUpload.js - 파일 업로드 실패:", error);
-      alert("🚨 Upload failed. Please try again.");
-  } finally {
-      setIsUploading(false);
-  }
-};
 
   return (
     <section className="upload-section">
@@ -99,7 +32,7 @@ const FileUpload = ({ onFileUpload }) => {
               alert("🚨 Unsupported file type. Please upload MP3, WAV, or FLAC files.");
               return;
             }
-            handleFileUpload(file);
+            onFileUpload(file);
           }
         }}
         onDragOver={(e) => {
@@ -120,7 +53,10 @@ const FileUpload = ({ onFileUpload }) => {
           id="uploadFileInput"  
           style={{ display: "none" }}
           accept=".mp3,.wav,.flac"
-          // onChange={(e) => handleFileUpload(e.target.files[0])} 
+          onChange={(e) => {
+            console.log("🔵 FileUpload.js - 파일 선택됨:", e.target.files[0]);
+            onFileUpload(e.target.files[0]);
+          }}
         />
       </div>
       <div className="feature-cards">

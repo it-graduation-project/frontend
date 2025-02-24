@@ -9,7 +9,7 @@ import "../styles/Hero.css";
 import waveImage from "../images/wave.png";
 import musicIconImage from "../images/music-icon.png";
 
-const Hero = () => {
+const Hero = ({ onFileUpload }) => {
   return (
     <section className="hero-section">
       <div className="hero-content">
@@ -27,7 +27,10 @@ const Hero = () => {
           id="heroFileInput"  
           style={{ display: "none" }}
           accept=".mp3,.wav,.flac"
-          // onChange={(e) => handleFileUpload(e.target.files[0])}
+          onChange={(e) => {
+            console.log("🔵 Hero.js - 파일 선택됨:", e.target.files[0]);
+            onFileUpload(e.target.files[0]);
+          }}
         />
       </div>
       <img src={waveImage} alt="Wave Graphic" className="wave-graphic" />
