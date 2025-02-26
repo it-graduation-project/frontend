@@ -27,7 +27,9 @@ const Hero = ({ onFileUpload }) => {
           id="heroFileInput"  
           style={{ display: "none" }}
           accept=".mp3,.wav,.flac"
+          onClick={(e) => (e.target.value = null)} // 클릭할 때 값 초기화
           onChange={(e) => {
+            if (e.target.files.length === 0) return;
             console.log("🔵 Hero.js - 파일 선택됨:", e.target.files[0]);
             onFileUpload(e.target.files[0]);
           }}
