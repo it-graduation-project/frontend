@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "../styles/KeyFeatures.css";
-import frequencyIconImage from "../images/music-icon.png";
+import vibrateIconImage from "../images/vibrate-icon.png";
+import visualizeIconImage from "../images/visualize-icon.png";
+import gestureIconImage from "../images/gesture-icon.png";
 
 const features = [
   {
@@ -13,7 +15,7 @@ const features = [
       { icon: "🎵", text: "Melody as rhythmic patterns" },
       { icon: "🌊", text: "Dynamic range as intensity variation" },
     ],
-    icon: frequencyIconImage,
+    icon: vibrateIconImage,
   },
   {
     id: "visualization",
@@ -25,7 +27,7 @@ const features = [
       { icon: "💡", text: "Color shifts based on tone" },
       { icon: "⚡", text: "Beat-synchronized effects" },
     ],
-    icon: frequencyIconImage, 
+    icon: visualizeIconImage, 
   },
   {
     id: "gesture",
@@ -37,7 +39,7 @@ const features = [
       { icon: "🔊", text: "Volume control with swipe" },
       { icon: "🎛️", text: "Effect modulation via gestures" },
     ],
-    icon: frequencyIconImage, 
+    icon: gestureIconImage, 
   },
 ];
 
@@ -57,7 +59,7 @@ const KeyFeatures = () => {
             onClick={() => setSelectedFeature(feature)}
           >
             <div className="feature-icon">
-              <img src={frequencyIconImage} alt="Frequency Icon" />
+              <img src={feature.icon} alt={`${feature.title} Icon`} />
             </div>
             <h3>{feature.title}</h3>
             <p>{feature.shortDescription}</p>

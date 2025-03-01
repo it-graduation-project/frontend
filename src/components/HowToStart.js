@@ -7,6 +7,7 @@
 import React from "react";
 import "../styles/HowToStart.css";
 import musicIcon from "../images/music-icon.png";
+import bluetoothIcon from "../images/bluetooth-icon.png";
 
 const HowToStart = () => {
   return (
@@ -34,7 +35,10 @@ const HowToStart = () => {
           Connect your hardware device via Bluetooth <br />
           to start the experience
         </p>
-        <button className="connect-btn">🔗 Connect Device</button>
+        <button className="connect-btn">
+          <img src={bluetoothIcon} alt="Bluetooth Icon" className="bluetooth-icon" />
+          Connect Device
+        </button>
         <span className="small-text">Simple one-click Bluetooth connection</span>
       </div>
     </section>

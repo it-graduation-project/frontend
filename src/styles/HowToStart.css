@@ -50,7 +50,7 @@
     padding: 14px 28px; 
     border-radius: 14px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    font-size: 17px;
+    font-size: 18px;
     font-weight: bold;
     color: #374151;
     min-height: 55px; 
@@ -128,13 +128,18 @@
 }
 
 .connect-btn:hover {
-    background: #e0e0ff;
+    transform: scale(1.05);
 }
 
 .small-text {
     font-size: 13px; 
     margin-top: 25px; 
     opacity: 0.8;
+}
+
+.bluetooth-icon {
+    width: 12px; 
+    height: auto;
 }
 
 .music-icon {
