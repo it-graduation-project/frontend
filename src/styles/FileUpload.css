@@ -5,8 +5,7 @@
 
 .upload-section {
   text-align: center;
-  padding: 40px 20px;
-  background-color: #f9f9f9;
+  padding: 20px 20px;
 }
 
 .upload-section h2 {
@@ -37,16 +36,15 @@
 }
 
 .upload-icon {
-  width: 40px;
-  margin-bottom: 10px;
+  width: 35px;
 }
 
 .browse-btn {
   padding: 15px 30px;
-  background-color: #000000;
+  background: linear-gradient(135deg, #9333EA 10%, #7A5CEA 40%, #4285F4 90%);
   color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 9999px;
   cursor: pointer;
   transition: transform 0.2s, background-color 0.2s;
 }
@@ -58,37 +56,5 @@
 
 .upload-support {
   font-size: 12px;
-  color: #6c6c6c;
-}
-
-.feature-cards {
-  display: flex;
-  justify-content: space-around;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.feature-card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 20px;
-  max-width: 360px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.feature-icon {
-  width: 30px;
-  height: 34px;
-  margin-bottom: 10px;
-}
-
-.feature-card h3 {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-
-.feature-card p {
-  font-size: 14px;
   color: #6c6c6c;
 }

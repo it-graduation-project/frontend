@@ -6,9 +6,6 @@
 import React, { useState } from "react";
 import "../styles/FileUpload.css";
 import uploadIconImage from "../images/upload-icon.png";
-import frequencyIconImage from "../images/frequency-icon.png";
-import emotionIconImage from "../images/emotion-icon.png";
-import hapticIconImage from "../images/haptic-icon.png";
 
 const FileUpload = ({ onFileUpload }) => {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -42,7 +39,7 @@ const FileUpload = ({ onFileUpload }) => {
         onDragLeave={() => setIsDragOver(false)}
       >
         <img src={uploadIconImage} alt="Upload Icon" className="upload-icon" />
-        <h3>Drag and drop your audio file here</h3>
+        <h3>Drag and drop your music file here</h3>
         <p>or</p>
         <button className="browse-btn" onClick={() => document.getElementById("uploadFileInput").click()}>
           Browse Files
@@ -61,23 +58,6 @@ const FileUpload = ({ onFileUpload }) => {
           }}
         />
       </div>
-      <div className="feature-cards">
-          <div className="feature-card">
-            <img src={frequencyIconImage} alt="Frequency Icon" className="feature-icon" />
-            <h3>Frequency Visualization</h3>
-            <p>See music transformed into dynamic visual patterns based on frequency and amplitude</p>
-          </div>
-          <div className="feature-card">
-            <img src={emotionIconImage} alt="Emotion Icon" className="feature-icon" />
-            <h3>Emotion Analysis</h3>
-            <p>Experience the emotional journey of music through color and movement</p>
-          </div>
-          <div className="feature-card">
-            <img src={hapticIconImage} alt="Haptic Icon" className="feature-icon" />
-            <h3>Haptic Feedback</h3>
-            <p>Feel the rhythm through synchronized vibration patterns</p>
-          </div>
-        </div>
     </section>
   );
 };
