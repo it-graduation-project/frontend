@@ -11,8 +11,7 @@ import Hero from "./components/Hero";
 import HowToStart from "./components/HowToStart";
 import FileUpload from "./components/FileUpload";
 import Visualizer from "./components/Visualizer"; 
-import GestureControl from "./components/GestureControl";
-import GetStarted from "./components/GetStarted";
+import KeyFeatures from "./components/KeyFeatures";
 import Footer from "./components/Footer";
 import LoginPopup from "./components/LoginPopup";
 import SignupPopup from "./components/SignupPopup";
@@ -126,16 +125,13 @@ function App() {
        {/* How to Start 섹션 추가 */}
        <HowToStart />
 
-      {/* 파일 업로드 + 특징 섹션 */}
+      {/* 파일 업로드 섹션 */}
       <FileUpload onFileUpload={handleFileUpload} />
 
       {audioUrl && <Visualizer audioUrl={audioUrl} />}
 
-      {/* 제스처 컨트롤 섹션 */}
-      <GestureControl />
-
-      {/* 시작하기 섹션 */}
-      <GetStarted />
+      {/* Key Features 섹션 */}
+      <KeyFeatures /> 
 
       {/* 푸터 */}
       <Footer />
