@@ -3,13 +3,22 @@
   - 사용자가 이메일과 비밀번호를 입력하여 로그인할 수 있음
 */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Popup.css"; // 공통 팝업 스타일 
 
 const LoginPopup = ({ isOpen, onClose, onSignupOpen, onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  // 팝업이 닫힐 때 입력값 초기화
+  useEffect(() => {
+    if (!isOpen) {
+      setEmail("");
+      setPassword("");
+      setError("");
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null; // 팝업이 닫혀있으면 렌더링 X
 
@@ -18,7 +27,7 @@ const LoginPopup = ({ isOpen, onClose, onSignupOpen, onLoginSuccess }) => {
     setError("");
 
     try {
-      const response = await fetch("http://13.124.228.23:8080/auth/login", {  // 💡 AWS 서버 주소 사용
+      const response = await fetch("http://13.209.19.98:8080/auth/login", {  // 💡 AWS 서버 주소 사용
         method: "POST",
         headers: { "Content-Type": "application/json" },  
         body: JSON.stringify({ email, password }),  
@@ -31,11 +40,11 @@ const LoginPopup = ({ isOpen, onClose, onSignupOpen, onLoginSuccess }) => {
         if (data.token) {
           console.log("🔑 저장할 JWT 토큰:", data.token);
   
-          // 🔥 "Bearer " 제거 후 저장
+          // 
           const tokenWithoutBearer = data.token.replace("Bearer ", "");
           localStorage.setItem("jwtToken", tokenWithoutBearer);
   
-          onLoginSuccess(); // 🔥 Navbar.js에서 fetchUserInfo() 호출하도록 변경
+          onLoginSuccess(); 
           onClose();
         } else {
           setError(data.message || "Login failed.");
@@ -77,10 +86,10 @@ const LoginPopup = ({ isOpen, onClose, onSignupOpen, onLoginSuccess }) => {
             required
           />
           <div className="popup-footer">
-            <button type="submit" className="popup-login-btn full-width">Login</button>
+            <button type="submit" className="popup-submit-btn full-width">Login</button>
           </div>
         </form>
-        <p className="popup-signup">
+        <p className="popup-note">
           Don't have an account?<br />
           <a href="#" onClick={onSignupOpen}>Sign up</a>
         </p>

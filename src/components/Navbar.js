@@ -8,16 +8,18 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Navbar.css";
 import logoImage from "../images/logo.png";
-import LoginPopup from "./LoginPopup"; // 🔥 LoginPopup import 추가
+import LoginPopup from "./LoginPopup"; 
+import SignupPopup from "./SignupPopup";
 
 const Navbar = () => {
   const [userInfo, setUserInfo] = useState(null);
-  const [isLoginPopupOpen, setLoginPopupOpen] = useState(false); // 🔥 로그인 팝업 상태 추가
+  const [isLoginPopupOpen, setLoginPopupOpen] = useState(false); 
+  const [isSignupPopupOpen, setSignupPopupOpen] = useState(false);
 
   // 💡 사용자 정보 요청 (로그인 상태 유지)
   const fetchUserInfo = async (token) => {
     try {
-      const response = await fetch("http://13.124.228.23:8080/auth/me", {
+      const response = await fetch("http://13.209.19.98:8080/auth/me", {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -25,10 +27,19 @@ const Navbar = () => {
       });
 
       const data = await response.json();
+      console.log("🔍 User Info Response:", data);
+
       if (response.ok) {
-        setUserInfo({ email: data.email, username: data.username });  // 💡 사용자 정보 저장
+        setUserInfo({ email: data.email, username: data.username });  
       } else {
         console.error("User info fetch failed:", data.message);
+
+        // ✅ JWT가 만료되었으면 자동 로그아웃
+        if (response.status === 401) {
+          console.log("🔴 JWT 만료됨, 로그아웃 처리");
+          localStorage.removeItem("jwtToken");
+          setUserInfo(null);
+        }
       }
     } catch (error) {
       console.error("Fetching user info failed:", error);
@@ -37,14 +48,8 @@ const Navbar = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
-    if (token) {
-      fetchUserInfo(token);
-    }
-
-    return () => {
-      // 🔥 클린업 함수 추가 (메모리 누수 방지)
-      setUserInfo(null);
-    };
+    if (!token) return; // ✅ jwtToken이 없으면 fetchUserInfo() 호출 안 함
+    fetchUserInfo(token);
   }, []);
 
   // 🔥 로그인 성공 시 실행할 함수
@@ -55,12 +60,19 @@ const Navbar = () => {
     }
   };
 
-  // 💡 로그아웃 기능 추가
+  // 💡 로그아웃 기능 수정 (localStorage.clear() 후 새로고침)
   const handleLogout = () => {
     console.log("🔴 Logging out...");
-    localStorage.removeItem("jwtToken");  // 🔥 JWT 토큰 삭제
-    setUserInfo(null);  // 🔥 상태 업데이트
-};
+
+    // 🔥 모든 저장된 데이터 삭제
+    localStorage.clear();
+
+    // 🔥 상태 초기화
+    setUserInfo(null);
+
+    // 🔥 페이지 새로고침하여 전체 상태 초기화
+    window.location.reload();
+  };
 
   return (
     <>
@@ -72,11 +84,13 @@ const Navbar = () => {
         <div className="navbar-right">
           {userInfo ? (
             <div className="user-info">
-              <span className="welcome-text">{userInfo.username}님 환영합니다!</span>
+              <span className="welcome-text">
+                Welcome, <span className="username">{userInfo.username}</span>
+              </span>
               <button className="logout-btn" onClick={handleLogout}>Logout</button>
             </div>
           ) : (
-            <button className="login-btn" onClick={() => setLoginPopupOpen(true)}>Login</button> // 🔥 Login 버튼 클릭 시 팝업 열기
+            <button className="login-btn" onClick={() => setLoginPopupOpen(true)}>Login</button> 
           )}
         </div>
       </header>
@@ -86,8 +100,20 @@ const Navbar = () => {
       <LoginPopup 
         isOpen={isLoginPopupOpen} 
         onClose={() => setLoginPopupOpen(false)}
-        onSignupOpen={() => {}} 
+        onSignupOpen={() => { 
+          setLoginPopupOpen(false); 
+          setSignupPopupOpen(true); 
+        }} 
         onLoginSuccess={onLoginSuccess} 
+      />
+
+      <SignupPopup 
+        isOpen={isSignupPopupOpen} 
+        onClose={() => setSignupPopupOpen(false)}
+        onLoginOpen={() => { 
+          setSignupPopupOpen(false); 
+          setLoginPopupOpen(true); 
+        }} 
       />
     </>
   );

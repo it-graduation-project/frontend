@@ -46,10 +46,12 @@
   background: none;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
+  color: #6c6c6c;
 }
 
 .popup-close:hover {
   transform: scale(1.2);
+  color: #000000;
 }
 
 .popup-label {
@@ -68,7 +70,7 @@
   font-size: 14px;
 }
 
-.popup-login-btn {
+.popup-submit-btn {
   margin-top: 5px;
   width: 100%;
   padding: 15px;
@@ -81,17 +83,17 @@
   transition: background-color 0.2s ease-in-out;
 }
 
-.popup-login-btn:hover {
+.popup-submit-btn:hover {
   background-color: #5E18EB;
 }
 
-.popup-signup {
+.popup-note {
   color: #6c6c6c;
   font-size: 12px;
   margin-top: 25px;
 }
 
-.popup-signup a {
+.popup-note a {
   text-decoration: none;
   font-size: 14px;
   color: black;

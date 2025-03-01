@@ -12,73 +12,7 @@ import hapticIconImage from "../images/haptic-icon.png";
 
 const FileUpload = ({ onFileUpload }) => {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [isUploading, setIsUploading] = useState(false); // 업로드 진행 상태
-  const [audioUrl, setAudioUrl] = useState(null);
-
-  const handleFileUpload = async (file) => {
-    if (!file) return;
-
-    setIsUploading(true); // 업로드 시작
-    console.log("🔵 FileUpload.js - 파일 업로드 시작:", file.name); 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const token = localStorage.getItem("jwtToken");
-    console.log("🔑 사용자 토큰:", token);
-
-    if (!token) {
-        alert("Please login first.");
-        setIsUploading(false);
-        return;
-    }
-
-    try {
-      // console.log("🔑 업로드 시 사용할 토큰:", token); // 🔥 토큰 출력해서 확인
-      const response = await fetch("http://13.124.228.23:8080/files", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${token}` },
-        body: formData,
-        mode: "cors",
-      });
-
-      const responseText = await response.text();
-      console.log("🔴 서버 응답:", responseText);
-
-      if (!response.ok) {
-          if (response.status === 403) {
-              alert("🚨 Invalid token. Please log in again.");
-              localStorage.removeItem("jwtToken"); // 🔥 잘못된 토큰 제거
-          } else {
-              alert(`🚨 Upload failed: ${responseText}`);
-          }
-          setIsUploading(false);
-          return;
-      }
-
-      let data;
-      try {
-          data = JSON.parse(responseText);
-      } catch (error) {
-          console.error("🛑 JSON 파싱 오류:", error);
-          alert("🚨 Server error: Invalid response format.");
-          setIsUploading(false);
-          return;
-      }
-
-      if (data.fileUrl) {
-          console.log("🟢 FileUpload.js - 서버에서 받은 파일 URL:", data.fileUrl);
-          setAudioUrl(data.fileUrl);
-          onFileUpload(data.fileUrl);
-      } else {
-          console.error("🛑 FileUpload.js - 서버 응답 오류:", data);
-      }
-  } catch (error) {
-      console.error("🛑 FileUpload.js - 파일 업로드 실패:", error);
-      alert("🚨 Upload failed. Please try again.");
-  } finally {
-      setIsUploading(false);
-  }
-};
+  const allowedExtensions = new Set(["mp3", "wav", "flac"]);
 
   return (
     <section className="upload-section">
@@ -88,8 +22,18 @@ const FileUpload = ({ onFileUpload }) => {
         className={`upload-box ${isDragOver ? "drag-over" : ""}`}
         onDrop={(e) => {
           e.preventDefault();
-          handleFileUpload(e.dataTransfer.files[0]);
           setIsDragOver(false);
+
+          const file = e.dataTransfer.files[0];
+
+          if (file) {
+            const fileExtension = file.name.split(".").pop().toLowerCase();
+            if (!allowedExtensions.has(fileExtension)) {
+              alert("🚨 Unsupported file type. Please upload MP3, WAV, or FLAC files.");
+              return;
+            }
+            onFileUpload(file);
+          }
         }}
         onDragOver={(e) => {
           e.preventDefault();
@@ -100,12 +44,23 @@ const FileUpload = ({ onFileUpload }) => {
         <img src={uploadIconImage} alt="Upload Icon" className="upload-icon" />
         <h3>Drag and drop your audio file here</h3>
         <p>or</p>
-        <button className="browse-btn" onClick={() => document.getElementById("fileInput").click()}>
+        <button className="browse-btn" onClick={() => document.getElementById("uploadFileInput").click()}>
           Browse Files
         </button>
         <p className="upload-support">Supported formats: MP3, WAV, FLAC (Max 20MB)</p>
+        <input
+          type="file"
+          id="uploadFileInput"  
+          style={{ display: "none" }}
+          accept=".mp3,.wav,.flac"
+          onClick={(e) => (e.target.value = null)} // 클릭할 때 값 초기화
+          onChange={(e) => {
+            if (e.target.files.length === 0) return;
+            console.log("🔵 FileUpload.js - 파일 선택됨:", e.target.files[0]);
+            onFileUpload(e.target.files[0]);
+          }}
+        />
       </div>
-      {audioUrl && <audio controls src={audioUrl} className="audio-player" />}
       <div className="feature-cards">
           <div className="feature-card">
             <img src={frequencyIconImage} alt="Frequency Icon" className="feature-icon" />
