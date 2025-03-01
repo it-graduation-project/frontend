@@ -8,6 +8,7 @@ import React, { useState, useEffect } from "react";
 import "./styles/common.css"; // 글로벌 스타일
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
+import HowToStart from "./components/HowToStart";
 import FileUpload from "./components/FileUpload";
 import Visualizer from "./components/Visualizer"; 
 import GestureControl from "./components/GestureControl";
@@ -121,6 +122,9 @@ function App() {
 
       {/* 히어로 섹션 */}
       <Hero onFileUpload={handleFileUpload} />
+
+       {/* How to Start 섹션 추가 */}
+       <HowToStart />
 
       {/* 파일 업로드 + 특징 섹션 */}
       <FileUpload onFileUpload={handleFileUpload} />
