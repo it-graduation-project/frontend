@@ -1,3 +1,9 @@
+/*
+  KeyFeatures.css - 주요 기능 섹션 스타일
+  - 음악 촉각화, 시각화, 제스처 컨트롤 카드 디자인
+  - 선택된 기능의 상세 정보 스타일 지정
+*/
+
 .key-features {
   text-align: center;
   padding: 60px 20px;
@@ -20,7 +26,6 @@ h2 {
 
 .feature-card {
   background: transparent;
-  padding: 10px;
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -31,7 +36,7 @@ h2 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 220px;
+  height: 210px;
   position: relative;
 }
 
@@ -53,15 +58,6 @@ h2 {
   font-size: 16px;
   color: #666;
   margin: 0 10px;
-}
-
-.learn-more {
-  display: block;
-  color: #9333EA;
-  font-weight: bold;
-  margin-top: 13px;
-  font-size: 14px;
-  cursor: pointer;
 }
 
 .feature-icon {

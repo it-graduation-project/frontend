@@ -1,3 +1,19 @@
+/*
+  KeyFeatures.js - 주요 기능 섹션 컴포넌트
+  -------------------------------------------------
+  - 음악 촉각화, 시각화, 제스처 컨트롤 기능을 소개하는 섹션
+  - 각 기능을 카드 형태로 표시하며, 선택 시 상세 정보 제공
+  - 사용자가 특정 기능을 클릭하면 해당 기능의 세부 설명을 동적으로 표시
+
+  [ features 배열 구조 ]
+  - id: 기능의 고유 식별자 (예: "tactilization", "visualization", "gesture")
+  - title: 기능 제목 (예: "Music Tactilization")
+  - shortDescription: 기능 요약 설명
+  - detailsDescription: 기능의 상세 설명
+  - details: 해당 기능의 주요 특징을 리스트로 제공 
+  - icon: 해당 기능을 나타내는 이미지 경로
+*/
+
 import React, { useState } from "react";
 import "../styles/KeyFeatures.css";
 import vibrateIconImage from "../images/vibrate-icon.png";
@@ -63,7 +79,6 @@ const KeyFeatures = () => {
             </div>
             <h3>{feature.title}</h3>
             <p>{feature.shortDescription}</p>
-            <span className="learn-more">Click to learn more</span>
           </div>
         ))}
       </div>
