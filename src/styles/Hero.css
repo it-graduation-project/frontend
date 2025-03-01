@@ -7,7 +7,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 40px 20px;
+  padding: 40px 40px;
   background-color: #ffffff;
   flex-wrap: wrap;
 }
@@ -18,14 +18,25 @@
 }
 
 .hero-content h1 {
-  font-size: 50px;
-  margin-bottom: 20px;
+  font-size: 67px; 
+  margin-bottom: 30px;
+  line-height: 1; 
+  letter-spacing: -1px; 
 }
 
 .hero-content p {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 22px;
   color: #6c6c6c;
+  line-height: 1.4;
+}
+
+.hero-content .highlight-text {  
+  background: linear-gradient(90deg, #9333EA, #6366F1); 
+  background-clip: text;
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+  color: transparent; 
+  font-weight: bold;
 }
 
 .upload-btn {
@@ -55,5 +66,5 @@
   flex: 1;
   max-width: 600px;
   width: 100%;
-  border-radius: 0;
+  border-radius: 20px;
 }
