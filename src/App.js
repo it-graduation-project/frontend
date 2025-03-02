@@ -15,12 +15,14 @@ import KeyFeatures from "./components/KeyFeatures";
 import Footer from "./components/Footer";
 import LoginPopup from "./components/LoginPopup";
 import SignupPopup from "./components/SignupPopup";
+import ActionPopup from "./components/ActionPopup";
 
 function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [token, setToken] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null); // 업로드된 음악 URL 상태
+  const [popupData, setPopupData] = useState({ isOpen: false });
 
   useEffect(() => {
     const storedToken = localStorage.getItem("jwtToken");
@@ -70,6 +72,9 @@ function App() {
 
       {/* 푸터 */}
       <Footer />
+
+      {/* ✅ 공통 ActionPopup 사용 (파일 교체 / 로그아웃) */}
+      <ActionPopup {...popupData} />
     </div>
   );
 }

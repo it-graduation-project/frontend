@@ -7,13 +7,14 @@
  */
 
 import React, { useEffect } from "react";
+import { visualizerWindows } from "../utils/visualizerManager"; // ✅ 전역 배열 import
 
 const Visualizer = ({ audioUrl }) => {
   useEffect(() => {
     if (!audioUrl) return; // 음악이 없으면 실행 안 함
 
     // React에서 전달된 audioUrl을 새 창에서 로드할 URL 파라미터로 추가
-    const visualizerUrl = `/visualizer/index.html?audioUrl=${encodeURIComponent(audioUrl)}`;
+    const visualizerUrl = `/visualizer/index.html?audioUrl=${encodeURIComponent(audioUrl)}`;    
 
     console.log("🌐 새 창에서 시각화 화면 열기:", visualizerUrl); // 디버깅
 
@@ -22,6 +23,8 @@ const Visualizer = ({ audioUrl }) => {
 
     if (!newWindow) {
       console.error("❌ 팝업 차단으로 인해 새 창을 열 수 없습니다.");
+    } else {
+      visualizerWindows.push(newWindow); // ✅ 전역 배열에 추가
     }
 
     // 새 창이 닫히면 상태 업데이트 (선택 사항)
