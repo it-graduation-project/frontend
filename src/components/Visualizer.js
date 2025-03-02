@@ -17,7 +17,7 @@ const Visualizer = ({ audioUrl }) => {
 
     console.log("🌐 새 창에서 시각화 화면 열기:", visualizerUrl); // 디버깅
 
-    // ✅ 새 창에서 실행
+    // 새 창에서 실행
     const newWindow = window.open(visualizerUrl, "_blank", "width=1200,height=800");
 
     if (!newWindow) {

@@ -75,7 +75,7 @@ let analyser = null;
 let currentPlaybackTime = 0;
 let isPlaying = false;
 
-// ✅ 버튼 하나로 모든 상태 처리 (로딩 중, 재생, 정지)
+// 버튼 하나로 모든 상태 처리 (로딩 중, 재생, 정지)
 const playPauseButton = document.createElement("button");
 playPauseButton.textContent = "Loading";
 playPauseButton.style.position = "absolute";
@@ -91,7 +91,7 @@ playPauseButton.style.border = "none";
 playPauseButton.style.cursor = "not-allowed";
 document.body.appendChild(playPauseButton);
 
-// ✅ JWT 포함해서 fetch 요청
+// JWT 포함해서 fetch 요청
 const fetchAudioWithJWT = async (url) => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
@@ -124,7 +124,7 @@ const fetchAudioWithJWT = async (url) => {
     }
 };
 
-// ✅ 오디오 로드 및 버튼 활성화
+// 오디오 로드 및 버튼 활성화
 const urlParams = new URLSearchParams(window.location.search);
 const storedAudioUrl = urlParams.get("audioUrl");
 
@@ -152,7 +152,7 @@ window.onload = async function () {
         analyser = new THREE.AudioAnalyser(sound, 256);
         console.log("🎛 AudioAnalyser 생성 완료!");
 
-        // ✅ 버튼 활성화
+        // 버튼 활성화
         playPauseButton.textContent = "Play";
         playPauseButton.style.backgroundColor = "#28a745";
         playPauseButton.style.cursor = "pointer";
@@ -205,13 +205,13 @@ window.onload = async function () {
     });
 };
 
-// ✅ 초기 장면을 렌더링 (흰 화면 방지)
+// 초기 장면을 렌더링 (흰 화면 방지)
 function initialRender() {
     bloomComposer.render();
 }
 initialRender();
 
-// ✅ 애니메이션 루프 (재생 중일 때만 실행)
+// 애니메이션 루프 (재생 중일 때만 실행)
 const clock = new THREE.Clock();
 let animateFrameId;
 
@@ -235,7 +235,7 @@ function animate() {
     bloomComposer.render();
 }
 
-// ✅ 시각화 설정 유지
+// 시각화 설정 유지
 const gui = new GUI();
 console.log("📟 GUI 패널 생성 완료");
 
@@ -251,7 +251,7 @@ bloomFolder.add(params, 'threshold', 0, 1).onChange(value => bloomPass.threshold
 bloomFolder.add(params, 'strength', 0, 3).onChange(value => bloomPass.strength = Number(value));
 bloomFolder.add(params, 'radius', 0, 1).onChange(value => bloomPass.radius = Number(value));
 
-// ✅ 마우스 이벤트 디버깅
+// 마우스 이벤트 디버깅
 let mouseX = 0;
 let mouseY = 0;
 document.addEventListener('mousemove', e => {
@@ -259,7 +259,7 @@ document.addEventListener('mousemove', e => {
     mouseY = (e.clientY - window.innerHeight / 2) / 100;
 });
 
-// ✅ 창 크기 변경 디버깅
+// 창 크기 변경 디버깅
 window.addEventListener('resize', function() {
     // console.log("📏 창 크기 변경 감지됨!");
 
