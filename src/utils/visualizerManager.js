@@ -7,13 +7,7 @@
 
 export const visualizerWindows = [];
 
-/*
-  closeAllVisualizerWindows - 열린 모든 시각화 창 닫기 함수
-  - visualizerWindows 배열에 저장된 모든 창을 닫음
-  - 닫힌 창은 배열에서 제거하여 불필요한 데이터 누적 방지
-  - 로그아웃 시, 기존 음악 삭제 시 호출됨
-*/
-
+// 열린 모든 시각화 창 닫기 (로그아웃, 음악 교체 시 호출됨)
 export const closeAllVisualizerWindows = () => {
   visualizerWindows.forEach((win) => {
     if (win && !win.closed) {
@@ -21,4 +15,13 @@ export const closeAllVisualizerWindows = () => {
     }
   });
   visualizerWindows.length = 0; // 배열 초기화
+};
+
+// 불필요한 창 제거 함수
+export const cleanupVisualizerWindows = () => {
+  for (let i = visualizerWindows.length - 1; i >= 0; i--) {
+    if (!visualizerWindows[i] || visualizerWindows[i].closed) {
+      visualizerWindows.splice(i, 1);
+    }
+  }
 };

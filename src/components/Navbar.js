@@ -8,7 +8,7 @@
 */
 
 import React, { useState, useEffect } from "react";
-import { visualizerWindows, closeAllVisualizerWindows } from "../utils/visualizerManager"; // ✅ 전역 배열 import
+import { closeAllVisualizerWindows } from "../utils/visualizerManager"; // ✅ 전역 배열 import
 import "../styles/Navbar.css";
 import logoImage from "../images/logo.png";
 import LoginPopup from "./LoginPopup"; 
