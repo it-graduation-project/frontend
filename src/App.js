@@ -1,7 +1,9 @@
 /*
   App.js - 애플리케이션의 메인 파일
-  - 전체적인 구조를 담당하며, 페이지 컴포넌트들을 포함함
-  - 음악 파일 업로드 후 시각화할 수 있도록 `Visualizer.js`와 연결
+  -------------------------------------------------
+  - 전체적인 애플리케이션 구조를 담당하며 주요 컴포넌트 포함
+  - 네비게이션 바, 파일 업로드, 음악 시각화 기능 연결
+  - 로그인 및 회원가입 팝업을 관리하여 인증 처리
 */
 
 import React, { useState, useEffect } from "react";
@@ -17,11 +19,12 @@ import LoginPopup from "./components/LoginPopup";
 import SignupPopup from "./components/SignupPopup";
 
 function App() {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isSignupOpen, setIsSignupOpen] = useState(false);
-  const [token, setToken] = useState(null);
+  const [isLoginOpen, setIsLoginOpen] = useState(false); // 로그인 팝업 상태
+  const [isSignupOpen, setIsSignupOpen] = useState(false); // 회원가입 팝업 상태
+  const [token, setToken] = useState(null); // JWT 토큰 상태
   const [audioUrl, setAudioUrl] = useState(null); // 업로드된 음악 URL 상태
 
+  // 애플리케이션 시작 시 로컬스토리지에서 JWT 토큰 확인
   useEffect(() => {
     const storedToken = localStorage.getItem("jwtToken");
     if (storedToken) setToken(storedToken);
@@ -40,7 +43,7 @@ function App() {
           setIsLoginOpen(false);
           setIsSignupOpen(true);
         }}
-        onLogin={setToken}
+        onLogin={setToken} // 로그인 성공 시 토큰 설정
       />
 
       {/* 회원가입 팝업 */}
@@ -56,7 +59,7 @@ function App() {
       {/* 히어로 섹션 */}
       <Hero />
 
-       {/* How to Start 섹션 추가 */}
+       {/* How to Start 섹션 */}
        <HowToStart />
 
       {/* 파일 업로드 섹션 */}
@@ -65,7 +68,7 @@ function App() {
       {/* 업로드된 음악이 있으면 시각화 실행 */}
       {audioUrl && <Visualizer audioUrl={audioUrl} />}
 
-      {/* Key Features 섹션 */}
+      {/* 주요 기능 섹션 */}
       <KeyFeatures /> 
 
       {/* 푸터 */}

@@ -1,3 +1,12 @@
+/*
+  scripts.js - Three.js 기반 음악 시각화 스크립트
+  -------------------------------------------------
+  - WebGL을 활용한 음악 시각화를 담당하는 스크립트
+  - Three.js를 사용하여 3D 객체와 후처리 효과 적용
+  - Web Audio API와 연동하여 음악 분석 및 시각적 반응 구현
+  - 사용자 인터랙션 (재생/정지 버튼, 마우스 입력, GUI 조절) 지원
+*/
+
 console.log("✅ scripts.js 실행됨!");
 console.log("✅ import.meta.url:", import.meta.url);
 
@@ -9,11 +18,14 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
 
+// Three.js 렌더러 설정
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
+
+// 카메라 설정 (원근 투영)
 const camera = new THREE.PerspectiveCamera(
     45,
     window.innerWidth / window.innerHeight,
@@ -21,6 +33,7 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
+// 블룸 효과를 위한 파라미터
 const params = {
     red: 1.0,
     green: 1.0,
@@ -32,6 +45,7 @@ const params = {
 
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
+// 후처리 효과 설정 (렌더 패스 + 블룸 효과)
 const renderScene = new RenderPass(scene, camera);
 const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight));
 bloomPass.threshold = params.threshold;
@@ -45,9 +59,11 @@ bloomComposer.addPass(bloomPass);
 const outputPass = new ShaderPass(CopyShader);
 bloomComposer.addPass(outputPass);
 
+// 카메라 위치 및 초기 시점 설정
 camera.position.set(0, -2, 14);
 camera.lookAt(0, 0, 0);
 
+// 셰이더 유니폼 변수 설정
 const uniforms = {
     u_time: { type: 'f', value: 0.0 },
     u_frequency: { type: 'f', value: 0.0 },
@@ -56,6 +72,7 @@ const uniforms = {
     u_blue: { type: 'f', value: 1.0 }
 };
 
+// 3D 오브젝트 생성 (이코사헤드론)
 const mat = new THREE.ShaderMaterial({
     uniforms,
     vertexShader: document.getElementById('vertexshader').textContent,
@@ -67,6 +84,7 @@ const mesh = new THREE.Mesh(geo, mat);
 scene.add(mesh);
 mesh.material.wireframe = true;
 
+// 오디오 설정
 const listener = new THREE.AudioListener();
 camera.add(listener);
 
@@ -75,7 +93,7 @@ let analyser = null;
 let currentPlaybackTime = 0;
 let isPlaying = false;
 
-// 버튼 하나로 모든 상태 처리 (로딩 중, 재생, 정지)
+// 로딩/재생/정지 버튼 생성 및 스타일 설정
 const playPauseButton = document.createElement("button");
 playPauseButton.textContent = "Loading";
 playPauseButton.style.position = "absolute";
@@ -91,7 +109,7 @@ playPauseButton.style.border = "none";
 playPauseButton.style.cursor = "not-allowed";
 document.body.appendChild(playPauseButton);
 
-// JWT 포함해서 fetch 요청
+// JWT 토큰을 포함하여 서버에서 오디오 파일 가져오기
 const fetchAudioWithJWT = async (url) => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
@@ -239,13 +257,13 @@ function animate() {
 const gui = new GUI();
 console.log("📟 GUI 패널 생성 완료");
 
-// 🎨 Colors Folder (색상 조절)
+// 색상 조절
 const colorsFolder = gui.addFolder('Colors');
 colorsFolder.add(params, 'red', 0, 1).onChange(value => uniforms.u_red.value = Number(value));
 colorsFolder.add(params, 'green', 0, 1).onChange(value => uniforms.u_green.value = Number(value));
 colorsFolder.add(params, 'blue', 0, 1).onChange(value => uniforms.u_blue.value = Number(value));
 
-// ✨ Bloom Folder (블룸 효과 조절)
+// 블룸 효과 조절
 const bloomFolder = gui.addFolder('Bloom');
 bloomFolder.add(params, 'threshold', 0, 1).onChange(value => bloomPass.threshold = Number(value));
 bloomFolder.add(params, 'strength', 0, 3).onChange(value => bloomPass.strength = Number(value));
@@ -259,10 +277,9 @@ document.addEventListener('mousemove', e => {
     mouseY = (e.clientY - window.innerHeight / 2) / 100;
 });
 
-// 창 크기 변경 디버깅
+// 창 크기 변경 이벤트 핸들러
 window.addEventListener('resize', function() {
     // console.log("📏 창 크기 변경 감지됨!");
-
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);

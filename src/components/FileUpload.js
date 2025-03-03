@@ -1,6 +1,10 @@
 /*
   FileUpload.js - 음악 업로드 섹션
+  -------------------------------------------------
   - 사용자가 음악을 업로드하고 시각화를 경험할 수 있도록 함
+  - MP3, WAV, FLAC 형식의 오디오 파일을 지원
+  - 파일 드래그 & 드롭 및 직접 선택 방식으로 업로드 가능
+  - 업로드된 파일을 서버로 전송하고, 성공 시 해당 URL을 반환받음
 */
 
 import React, { useState } from "react";
@@ -8,11 +12,12 @@ import "../styles/FileUpload.css";
 import uploadIconImage from "../images/upload-icon.png";
 
 const FileUpload = ({ onFileUpload }) => {
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [audioUrl, setAudioUrl] = useState(null);
+  const [isDragOver, setIsDragOver] = useState(false); // 파일 드래그 중 여부
+  const [isUploading, setIsUploading] = useState(false); // 업로드 상태 여부
+  const [audioUrl, setAudioUrl] = useState(null); // 업로드된 파일의 URL 저장
   const allowedExtensions = new Set(["mp3", "wav", "flac"]);
 
+  // 파일 업로드를 처리하는 함수
   const handleFileUpload = async (file) => {
     if (!file) return;
 
@@ -88,7 +93,7 @@ const FileUpload = ({ onFileUpload }) => {
           e.preventDefault();
           setIsDragOver(false);
 
-          const file = e.dataTransfer.files[0];
+          const file = e.dataTransfer.files[0]; // 드롭된 파일 가져오기
 
           if (file) {
             const fileExtension = file.name.split(".").pop().toLowerCase();
@@ -117,7 +122,7 @@ const FileUpload = ({ onFileUpload }) => {
           id="uploadFileInput"  
           style={{ display: "none" }}
           accept=".mp3,.wav,.flac"
-          onClick={(e) => (e.target.value = null)} // 클릭할 때 값 초기화
+          onClick={(e) => (e.target.value = null)} // 클릭할 때마다 선택 초기화
           onChange={(e) => {
             if (e.target.files.length === 0) return;
             console.log("🔵 FileUpload.js - 파일 선택됨:", e.target.files[0]);

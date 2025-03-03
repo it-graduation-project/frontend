@@ -1,3 +1,12 @@
+<!--
+  index.html - Three.js 기반 음악 시각화 페이지
+  -------------------------------------------------
+  - Three.js 및 관련 라이브러리를 로드하여 WebGL 기반 시각화 수행
+  - React에서 전달된 오디오 URL을 활용하여 음악 데이터를 가져옴
+  - Vertex Shader 및 Fragment Shader를 정의하여 음악 기반 그래픽 효과 적용
+  - scripts.js를 로드하여 전체적인 로직 및 이벤트 처리 수행
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +20,7 @@
         }
     </style>
 
-    <!-- ✅ Three.js 및 종속 라이브러리 CDN 로드 -->
+    <!-- Three.js 및 종속 라이브러리 CDN 로드 -->
     <script type="importmap">
       {
           "imports": {
@@ -28,8 +37,7 @@
 </head>
 
 <body>
-
-    <!-- ✅ React에서 전달된 audioUrl을 전역 변수로 저장 -->
+    <!-- React에서 전달된 audioUrl을 전역 변수로 저장 -->
     <script>
       function getQueryParam(name) {
           const urlParams = new URLSearchParams(window.location.search);
@@ -40,15 +48,17 @@
 
       if (audioUrl) {
           console.log("🟢 visualizer/index.html - React에서 받은 파일 URL:", audioUrl); 
-          window.audioUrl = audioUrl; // ✅ 전역 변수로 저장
+          window.audioUrl = audioUrl; // 전역 변수로 저장하여 scripts.js에서 접근 가능
       } else {
           console.warn("🟡 visualizer/index.html - 파일 URL이 없습니다."); 
       }
     </script>
 
+    <!-- Vertex Shader 정의: Perlin Noise를 활용한 변형 적용 -->
     <script id="vertexshader" type="vertex">
       uniform float u_time;
 
+      // Perlin Noise 함수 정의
       vec3 mod289(vec3 x)
       {
         return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -153,6 +163,7 @@
       }
     </script>
 
+     <!-- Fragment Shader 정의: 색상 조절 기능 -->
     <script id="fragmentshader" type="fragment">
         uniform float u_red;
         uniform float u_blue;
@@ -162,7 +173,7 @@
         }
     </script>
 
-    <!-- ✅ scripts.js 실행 -->
+    <!-- scripts.js 실행 -->
     <script type="module" src="./scripts.js"></script>
 
 </body>
