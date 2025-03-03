@@ -38,6 +38,8 @@
     font-size: 18px !important;
     font-weight: bold;
     margin-bottom: 10px;
+    font-variant-ligatures: none;
+    text-rendering: optimizeLegibility;
   }
   
   .action-popup-message {
