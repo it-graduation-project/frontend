@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import "../styles/FileUpload.css";
 import uploadIconImage from "../images/upload-icon.png";
 import ActionPopup from "./ActionPopup";
-import { closeAllVisualizerWindows } from "../utils/visualizerManager";
+import { cleanupVisualizerWindows, visualizerWindows, closeAllVisualizerWindows } from "../utils/visualizerManager";
 
 const FileUpload = ({ onFileUpload }) => {
   const [isDragOver, setIsDragOver] = useState(false); // 파일 드래그 중 여부
@@ -26,13 +26,18 @@ const FileUpload = ({ onFileUpload }) => {
   const handleFileUpload = async (file) => {
     if (!file) return;
 
-    // ✅ 기존 음악이 있는 경우 경고창 표시
-    if (audioUrl) {
+    // 시각화 창 목록 정리 (닫힌 창 삭제)
+    cleanupVisualizerWindows();
+
+    // 기존 음악이 있고 시각화 창이 열려 있다면 경고창 띄우기
+    if (audioUrl && visualizerWindows.length > 0) {
+      console.error("기존 음악이 있고 시각화 창이 열려 있음");
       setSelectedFile(file);
       setIsPopupOpen(true);
       return;
     }
 
+    // 시각화 창이 닫혀 있으면 경고 없이 바로 업로드
     uploadFile(file);
   };
 
@@ -87,14 +92,9 @@ const FileUpload = ({ onFileUpload }) => {
 
       if (data.fileUrl) {
           console.log("🟢 FileUpload.js - 서버에서 받은 파일 URL:", data.fileUrl);
-
           closeAllVisualizerWindows(); // ✅ 기존 시각화 창 닫기
-
-          setAudioUrl(null); // ✅ 기존 상태 초기화 (새 시각화 트리거)
-          setTimeout(() => {
-            setAudioUrl(data.fileUrl); // ✅ 새로운 음악 URL 설정
-            onFileUpload(data.fileUrl);
-          }, 100); // 약간의 딜레이 적용 - 상태 변경이 반영되도록 함
+          setAudioUrl(data.fileUrl); // ✅ 새로운 음악 URL 설정
+          onFileUpload(data.fileUrl);
       } else {
           console.error("🛑 FileUpload.js - 서버 응답 오류:", data);
       }

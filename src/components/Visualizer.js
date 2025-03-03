@@ -26,11 +26,21 @@ const Visualizer = ({ audioUrl }) => {
     // 새 창을 열어 시각화 실행
     const newWindow = window.open(visualizerUrl, "_blank", "width=1200,height=800");
 
-    if (!newWindow) {
+    if (newWindow) {
+      visualizerWindows.push(newWindow);
+    
+      // 창이 닫힐 때 `visualizerWindows`에서 자동 제거
+      newWindow.onbeforeunload = () => {
+        const index = visualizerWindows.indexOf(newWindow);
+        if (index > -1) {
+          visualizerWindows.splice(index, 1);
+        }
+      };
+    } else {
       console.error("❌ 팝업 차단으로 인해 새 창을 열 수 없습니다.");
-      return;
-    } 
-
+      alert("🚨 Popup blocked! Please allow pop-ups and try again.");
+    }
+    
     visualizerWindows.push(newWindow); // 전역 배열에 추가
 
     // 창이 닫히면 배열에서 제거
