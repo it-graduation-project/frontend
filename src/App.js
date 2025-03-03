@@ -17,12 +17,14 @@ import KeyFeatures from "./components/KeyFeatures";
 import Footer from "./components/Footer";
 import LoginPopup from "./components/LoginPopup";
 import SignupPopup from "./components/SignupPopup";
+import ActionPopup from "./components/ActionPopup";
 
 function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false); // 로그인 팝업 상태
   const [isSignupOpen, setIsSignupOpen] = useState(false); // 회원가입 팝업 상태
   const [token, setToken] = useState(null); // JWT 토큰 상태
   const [audioUrl, setAudioUrl] = useState(null); // 업로드된 음악 URL 상태
+  const [popupData, setPopupData] = useState({ isOpen: false });
 
   // 애플리케이션 시작 시 로컬스토리지에서 JWT 토큰 확인
   useEffect(() => {
@@ -73,6 +75,9 @@ function App() {
 
       {/* 푸터 */}
       <Footer />
+
+      {/* ✅ 공통 ActionPopup 사용 (파일 교체 / 로그아웃) */}
+      <ActionPopup {...popupData} />
     </div>
   );
 }

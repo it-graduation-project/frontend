@@ -10,19 +10,36 @@
 import React, { useState } from "react";
 import "../styles/FileUpload.css";
 import uploadIconImage from "../images/upload-icon.png";
+import ActionPopup from "./ActionPopup";
+import { closeAllVisualizerWindows } from "../utils/visualizerManager";
 
 const FileUpload = ({ onFileUpload }) => {
   const [isDragOver, setIsDragOver] = useState(false); // 파일 드래그 중 여부
   const [isUploading, setIsUploading] = useState(false); // 업로드 상태 여부
   const [audioUrl, setAudioUrl] = useState(null); // 업로드된 파일의 URL 저장
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
   const allowedExtensions = new Set(["mp3", "wav", "flac"]);
 
   // 파일 업로드를 처리하는 함수
   const handleFileUpload = async (file) => {
     if (!file) return;
 
-    setIsUploading(true); 
-    console.log("🔵 FileUpload.js - 파일 업로드 시작:", file.name); 
+    // ✅ 기존 음악이 있는 경우 경고창 표시
+    if (audioUrl) {
+      setSelectedFile(file);
+      setIsPopupOpen(true);
+      return;
+    }
+
+    uploadFile(file);
+  };
+
+  const uploadFile = async (file) => {
+    setIsUploading(true);
+    console.log("🔵 FileUpload.js - 파일 업로드 시작:", file.name);
+    
     const formData = new FormData();
     formData.append("file", file);
 
@@ -70,8 +87,14 @@ const FileUpload = ({ onFileUpload }) => {
 
       if (data.fileUrl) {
           console.log("🟢 FileUpload.js - 서버에서 받은 파일 URL:", data.fileUrl);
-          setAudioUrl(data.fileUrl);
-          onFileUpload(data.fileUrl);
+
+          closeAllVisualizerWindows(); // ✅ 기존 시각화 창 닫기
+
+          setAudioUrl(null); // ✅ 기존 상태 초기화 (새 시각화 트리거)
+          setTimeout(() => {
+            setAudioUrl(data.fileUrl); // ✅ 새로운 음악 URL 설정
+            onFileUpload(data.fileUrl);
+          }, 100); // 약간의 딜레이 적용 - 상태 변경이 반영되도록 함
       } else {
           console.error("🛑 FileUpload.js - 서버 응답 오류:", data);
       }
@@ -130,6 +153,20 @@ const FileUpload = ({ onFileUpload }) => {
           }}
         />
       </div>
+
+      {/* ✅ 기존 음악 파일이 있을 때 교체할지 묻는 팝업 */}
+      <ActionPopup
+        isOpen={isPopupOpen}
+        title="You have already uploaded a music file"
+        message="Uploading a new file will erase the current analysis. Do you want to continue?"
+        confirmText="Replace File"
+        cancelText="Cancel"
+        onConfirm={() => {
+          setIsPopupOpen(false);
+          uploadFile(selectedFile); // 새 파일 업로드 실행
+        }}
+        onClose={() => setIsPopupOpen(false)}
+      />
     </section>
   );
 };

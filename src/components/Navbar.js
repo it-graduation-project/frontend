@@ -8,15 +8,19 @@
 */
 
 import React, { useState, useEffect } from "react";
+import { visualizerWindows, closeAllVisualizerWindows } from "../utils/visualizerManager"; // ✅ 전역 배열 import
 import "../styles/Navbar.css";
 import logoImage from "../images/logo.png";
 import LoginPopup from "./LoginPopup"; 
 import SignupPopup from "./SignupPopup";
+import ActionPopup from "./ActionPopup";
+
 
 const Navbar = () => {
   const [userInfo, setUserInfo] = useState(null); // 사용자 정보 상태
   const [isLoginPopupOpen, setLoginPopupOpen] = useState(false); // 로그인 팝업 상태
   const [isSignupPopupOpen, setSignupPopupOpen] = useState(false); // 회원가입 팝업 상태
+  const [isLogoutPopupOpen, setIsLogoutPopupOpen] = useState(false);
 
 // 사용자 정보 요청 (JWT 토큰 기반 로그인 유지)
   const fetchUserInfo = async (token) => {
@@ -64,7 +68,14 @@ const Navbar = () => {
 
   // 로그아웃 처리 (localStorage 초기화 및 페이지 새로고침)
   const handleLogout = () => {
+    setIsLogoutPopupOpen(true); // 로그아웃 팝업 활성화
+  };
+
+  // 팝업에서 "Log Out" 버튼을 누르면 실행
+  const handleConfirmLogout = () => {
     console.log("🔴 Logging out...");
+
+    closeAllVisualizerWindows();
     localStorage.clear(); // 모든 저장된 데이터 삭제
     setUserInfo(null); // 상태 초기화
     window.location.reload(); // 페이지 새로고침
@@ -111,6 +122,17 @@ const Navbar = () => {
           setSignupPopupOpen(false); 
           setLoginPopupOpen(true); 
         }} 
+      />
+
+      {/* 로그아웃 확인 팝업 */}
+      <ActionPopup
+        isOpen={isLogoutPopupOpen}
+        title="Are you sure you want to log out?"
+        message="All visualizations will be closed."
+        confirmText="Log Out"
+        cancelText="Cancel"
+        onConfirm={handleConfirmLogout} // ✅ 로그아웃 확정 버튼 누르면 실행
+        onClose={() => setIsLogoutPopupOpen(false)} // ✅ 팝업 닫기
       />
     </>
   );
