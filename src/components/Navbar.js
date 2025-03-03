@@ -8,7 +8,7 @@
 */
 
 import React, { useState, useEffect } from "react";
-import { closeAllVisualizerWindows } from "../utils/visualizerManager"; // ✅ 전역 배열 import
+import { closeAllVisualizerWindows, visualizerWindows, cleanupVisualizerWindows } from "../utils/visualizerManager"; // ✅ 전역 배열 import
 import "../styles/Navbar.css";
 import logoImage from "../images/logo.png";
 import LoginPopup from "./LoginPopup"; 
@@ -66,9 +66,15 @@ const Navbar = () => {
     }
   };
 
-  // 로그아웃 처리 (localStorage 초기화 및 페이지 새로고침)
   const handleLogout = () => {
-    setIsLogoutPopupOpen(true); // 로그아웃 팝업 활성화
+    cleanupVisualizerWindows(); // 닫힌 창 정리
+  
+    // 시각화 창이 하나라도 열려 있으면 경고 팝업 띄우기
+    if (visualizerWindows.length > 0) {
+      setIsLogoutPopupOpen(true);
+    } else {
+      handleConfirmLogout(); // 창이 닫혀 있으면 바로 로그아웃 실행
+    }
   };
 
   // 팝업에서 "Log Out" 버튼을 누르면 실행
