@@ -184,7 +184,7 @@ window.onload = async function () {
 
                 // 오디오가 이미 실행 중이라면 정지
                 if (sound.isPlaying) {
-                    sound.stop(); // 완전히 정지
+                    sound.stop();
                     await new Promise(resolve => setTimeout(resolve, 50)); // 비동기적 대기를 통해 정확한 음악 재생
                 }
 
@@ -202,7 +202,7 @@ window.onload = async function () {
                 }, 50);
                 
                 isPlaying = true;
-                animate(); // 애니메이션 다시 실행
+                animate(); 
         
                 playPauseButton.textContent = "Stop"; // 정지 버튼으로 변경
                 playPauseButton.style.backgroundColor = "#dc3545"; 
