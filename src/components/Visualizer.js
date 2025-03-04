@@ -5,6 +5,7 @@
   - `window.open()`을 사용하여 `public/visualizer/index.html`을 새 창에서 로드
   - React와 Three.js 코드의 충돌을 방지하면서 독립적으로 시각화를 유지
   - 팝업 차단 여부를 확인하고 새 창을 닫는 로직 포함
+  - FFT 데이터를 시각화 창에서 분석 후 React로 전송
 */
 
 import React, { useEffect } from "react";
@@ -51,11 +52,21 @@ const Visualizer = ({ audioUrl }) => {
       }
     };
     
+    // ✅ FFT 데이터를 시각화 창에서 분석 후 React로 전송
+    const handleFFTResponse = (event) => {
+      if (event.data.type === "fftData") {
+        window.opener?.postMessage({ type: "fftData", value: event.data.value }, "*");
+      }
+    };
+    
+    window.addEventListener("message", handleFFTResponse);
+
     // 컴포넌트가 언마운트될 때 새 창 닫기
     return () => {
       if (newWindow && !newWindow.closed) {
         newWindow.close();
       }
+      window.removeEventListener("message", handleFFTResponse);
     };
   }, [audioUrl]);
 

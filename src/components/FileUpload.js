@@ -12,6 +12,7 @@ import "../styles/FileUpload.css";
 import uploadIconImage from "../images/upload-icon.png";
 import ActionPopup from "./ActionPopup";
 import { cleanupVisualizerWindows, visualizerWindows, closeAllVisualizerWindows } from "../utils/visualizerManager";
+import { startStreamingFFTData, getBluetoothStatus } from "../utils/bluetoothManager";
 
 const FileUpload = ({ onFileUpload }) => {
   const [isDragOver, setIsDragOver] = useState(false); // 파일 드래그 중 여부
@@ -21,6 +22,41 @@ const FileUpload = ({ onFileUpload }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const allowedExtensions = new Set(["mp3", "wav", "flac"]);
+
+  // ✅ 로그인 여부 확인 후 파일 선택기 활성화
+  const onBrowseFilesClick = () => {
+    const token = localStorage.getItem("jwtToken");
+
+    if (!token) {
+      alert("🚨 Please log in first.");  // 로그인하지 않으면 alert 표시
+      return;
+    }
+
+    document.getElementById("uploadFileInput").click();
+  };
+
+  // ✅ 드래그앤드롭 시 로그인 체크 후 업로드
+  const onDropFile = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      alert("🚨 Please log in first.");  // 로그인하지 않으면 alert 표시
+      return;
+    }
+
+    const file = e.dataTransfer.files[0]; // 드롭된 파일 가져오기
+
+    if (file) {
+      const fileExtension = file.name.split(".").pop().toLowerCase();
+      if (!allowedExtensions.has(fileExtension)) {
+        alert("🚨 Unsupported file type. Please upload MP3, WAV, or FLAC files.");
+        return;
+      }
+      handleFileUpload(file);
+    }
+  };
 
   // 파일 업로드를 처리하는 함수
   const handleFileUpload = async (file) => {
@@ -50,12 +86,6 @@ const FileUpload = ({ onFileUpload }) => {
 
     const token = localStorage.getItem("jwtToken");
     console.log("🔑 사용자 토큰:", token);
-
-    if (!token) {
-        alert("Please login first.");
-        setIsUploading(false);
-        return;
-    }
 
     try {
       // console.log("🔑 업로드 시 사용할 토큰:", token); 
@@ -95,6 +125,11 @@ const FileUpload = ({ onFileUpload }) => {
           closeAllVisualizerWindows(); // ✅ 기존 시각화 창 닫기
           setAudioUrl(data.fileUrl); // ✅ 새로운 음악 URL 설정
           onFileUpload(data.fileUrl);
+
+          // ✅ 블루투스 연결 확인 후 FFT 데이터 스트리밍 시작
+          if (getBluetoothStatus()) {
+            startStreamingFFTData();
+          }
       } else {
           console.error("🛑 FileUpload.js - 서버 응답 오류:", data);
       }
@@ -112,21 +147,7 @@ const FileUpload = ({ onFileUpload }) => {
       <p>Drop your music file and watch it transform into an immersive visual experience</p>
       <div
         className={`upload-box ${isDragOver ? "drag-over" : ""}`}
-        onDrop={(e) => {
-          e.preventDefault();
-          setIsDragOver(false);
-
-          const file = e.dataTransfer.files[0]; // 드롭된 파일 가져오기
-
-          if (file) {
-            const fileExtension = file.name.split(".").pop().toLowerCase();
-            if (!allowedExtensions.has(fileExtension)) {
-              alert("🚨 Unsupported file type. Please upload MP3, WAV, or FLAC files.");
-              return;
-            }
-            handleFileUpload(file);
-          }
-        }}
+        onDrop={onDropFile}
         onDragOver={(e) => {
           e.preventDefault();
           setIsDragOver(true);
@@ -136,7 +157,7 @@ const FileUpload = ({ onFileUpload }) => {
         <img src={uploadIconImage} alt="Upload Icon" className="upload-icon" />
         <h3>Drag and drop your music file here</h3>
         <p>or</p>
-        <button className="browse-btn" onClick={() => document.getElementById("uploadFileInput").click()}>
+        <button className="browse-btn" onClick={onBrowseFilesClick}>
           Browse Files
         </button>
         <p className="upload-support">Supported formats: MP3, WAV, FLAC (Max 20MB)</p>

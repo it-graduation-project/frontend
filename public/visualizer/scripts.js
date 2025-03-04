@@ -5,10 +5,10 @@
   - Three.js를 사용하여 3D 객체와 후처리 효과 적용
   - Web Audio API와 연동하여 음악 분석 및 시각적 반응 구현
   - 사용자 인터랙션 (재생/정지 버튼, 마우스 입력, GUI 조절) 지원
+  - FFT 데이터를 React로 전달하여 블루투스 제어 가능
 */
 
 console.log("✅ scripts.js 실행됨!");
-console.log("✅ import.meta.url:", import.meta.url);
 
 import * as THREE from "three";
 import { GUI } from "dat.gui";
@@ -17,6 +17,35 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
+
+// ✅ FFT 데이터를 React로 전송하는 함수
+function sendFFTDataToReact(value) {
+    window.opener?.postMessage({ type: "fftData", value }, "*");
+}
+
+// ✅ FFT 분석을 통해 데이터를 React로 전달
+function detectBeat() {
+    if (!analyser) return;
+
+    let freqData = analyser.getFrequencyData();
+    let sum = 0;
+    let count = 0;
+
+    // 50Hz ~ 200Hz 대역의 평균값 계산
+    for (let i = 5; i < 20; i++) {
+        sum += freqData[i];
+        count++;
+    }
+    let avg = sum / count;
+
+    // ✅ React에 FFT 데이터 전달
+    sendFFTDataToReact(avg);
+}
+
+// ✅ 100ms마다 FFT 분석 후 React로 데이터 전송
+setInterval(() => {
+    detectBeat();
+}, 100);
 
 // Three.js 렌더러 설정
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -288,5 +317,12 @@ window.addEventListener('resize', function() {
     if (!isPlaying) {
         console.log("🖼️ 창 크기 변경 시 마지막 프레임 유지");
         bloomComposer.render();
+    }
+});
+
+// ✅ React에서 블루투스 상태를 받을 수 있도록 설정
+window.addEventListener("message", (event) => {
+    if (event.data.type === "bluetoothStatus") {
+        console.log(`💡 Bluetooth Status: ${event.data.status}`);
     }
 });
