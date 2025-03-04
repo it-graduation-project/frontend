@@ -177,8 +177,37 @@ window.onload = async function () {
 
         let audioContextStartTime = 0; // 오디오 재생 시작 시간
 
-        playPauseButton.addEventListener("click", () => {
-            if (!isPlaying) {
+        playPauseButton.addEventListener("click", async() => {
+            if (playPauseButton.textContent === "Replay") {
+                // 음악 처음부터 다시 재생
+                console.log("🔄 음악 다시 재생");
+
+                // 오디오가 이미 실행 중이라면 정지
+                if (sound.isPlaying) {
+                    sound.stop(); // 완전히 정지
+                    await new Promise(resolve => setTimeout(resolve, 50)); // 비동기적 대기를 통해 정확한 음악 재생
+                }
+
+                currentPlaybackTime = 0; // 처음부터 재생하기 위한 셋업
+                sound.offset = 0; // 0초부터 시작 강제 지정
+                sound.play(); // 재생 실행
+
+                setTimeout(() => { 
+                    /*
+                        - Web Audio Api의 비동기적 특성으로 `sound.play()` 실행 직후 `context.currentTime`을 읽으면 부정확할 수 있음
+                        → setTimeout() 사용해 실제 오디오가 재생된 후 정확한 재생 시간 기록 + 사용자의 버튼 연타 시 발생하는 버그 수정
+                    */
+                    audioContextStartTime = sound.context.currentTime; // play() 실행 이후 정확한 시간 기록
+                    console.log(`🎯 audioContextStartTime이 0초로 설정됨`);
+                }, 50);
+                
+                isPlaying = true;
+                animate(); // 애니메이션 다시 실행
+        
+                playPauseButton.textContent = "Stop"; // 정지 버튼으로 변경
+                playPauseButton.style.backgroundColor = "#dc3545"; 
+                
+            } else if (!isPlaying) {
                 // ▶ 재생 모드
                 if (sound.context.state === "suspended") {
                     sound.context.resume().then(() => {
@@ -192,7 +221,7 @@ window.onload = async function () {
                         playPauseButton.textContent = "Stop";
                         playPauseButton.style.backgroundColor = "#dc3545"; 
                     });
-                } else {
+            } else {
                     sound.offset = currentPlaybackTime;
                     sound.play();
                     audioContextStartTime = sound.context.currentTime - currentPlaybackTime;
@@ -221,6 +250,19 @@ window.onload = async function () {
             }
         });
     });
+};
+
+// 음악 종료 시 Replay 버튼으로 변경
+sound.onEnded = function () {
+    console.log("🎵 음악이 끝났습니다. Replay 버튼으로 변경");
+
+    playPauseButton.textContent = "Replay";
+    playPauseButton.style.backgroundColor = "#60A5FA"; 
+    playPauseButton.style.color = "white";
+    playPauseButton.style.cursor = "pointer";
+
+    isPlaying = false;
+    currentPlaybackTime = 0; // 재생 위치 초기화
 };
 
 // 초기 장면을 렌더링 (흰 화면 방지)
