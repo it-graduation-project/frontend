@@ -1,3 +1,13 @@
+/*
+  ActionPopup.js - 사용자 인터랙션을 위한 확인/취소 팝업 컴포넌트
+  --------------------------------------------------------------
+  - React 기반의 커스텀 팝업 창 (확인/취소 버튼 포함)
+  - 경고 아이콘과 메시지를 표시하여 사용자에게 중요한 액션을 안내
+  - 외부에서 열림/닫힘 상태를 제어할 수 있도록 `isOpen` prop 사용
+  - `onConfirm`, `onClose` 콜백을 통해 사용자의 선택을 핸들링
+  - 스타일링은 `ActionPopup.css`에서 관리
+*/
+
 import React from "react";
 import "../styles/ActionPopup.css";
 import warningIcon from "../images/warning-icon.png"; 

@@ -81,6 +81,14 @@ const Navbar = () => {
   const handleConfirmLogout = () => {
     console.log("🔴 Logging out...");
 
+    // 시각화 창이 열려있으면 웹캠 닫기 메시지 전송 후 닫기
+    visualizerWindows.forEach(win => {
+      if (win && !win.closed) {
+        win.postMessage({ action: "closeWebcam" }, "*");
+        win.close();
+      }
+    });
+
     closeAllVisualizerWindows();
     localStorage.clear(); // 모든 저장된 데이터 삭제
     setUserInfo(null); // 상태 초기화
@@ -137,8 +145,8 @@ const Navbar = () => {
         message="All visualizations will be closed."
         confirmText="Log Out"
         cancelText="Cancel"
-        onConfirm={handleConfirmLogout} // ✅ 로그아웃 확정 버튼 누르면 실행
-        onClose={() => setIsLogoutPopupOpen(false)} // ✅ 팝업 닫기
+        onConfirm={handleConfirmLogout} // 로그아웃 확정 버튼 누르면 실행
+        onClose={() => setIsLogoutPopupOpen(false)} // 팝업 닫기
       />
     </>
   );
