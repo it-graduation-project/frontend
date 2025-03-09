@@ -10,6 +10,7 @@
 
 console.log("✅ scripts.js 실행됨!");
 
+
 import * as THREE from "three";
 import { GUI } from "dat.gui";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
@@ -18,12 +19,12 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
 
-// ✅ FFT 데이터를 React로 전송하는 함수
+// FFT 데이터를 React로 전송하는 함수
 function sendFFTDataToReact(value) {
     window.opener?.postMessage({ type: "fftData", value }, "*");
 }
 
-// ✅ FFT 분석을 통해 데이터를 React로 전달
+// FFT 분석을 통해 데이터를 React로 전달
 function detectBeat() {
     if (!analyser) return;
 
@@ -38,11 +39,11 @@ function detectBeat() {
     }
     let avg = sum / count;
 
-    // ✅ React에 FFT 데이터 전달
+    // React에 FFT 데이터 전달
     sendFFTDataToReact(avg);
 }
 
-// ✅ 100ms마다 FFT 분석 후 React로 데이터 전송
+// 100ms마다 FFT 분석 후 React로 데이터 전송
 setInterval(() => {
     detectBeat();
 }, 100);
@@ -121,6 +122,7 @@ const sound = new THREE.Audio(listener);
 let analyser = null; 
 let currentPlaybackTime = 0;
 let isPlaying = false;
+let audioContextStartTime = 0; // 추가
 
 // 로딩/재생/정지 버튼 생성 및 스타일 설정
 const playPauseButton = document.createElement("button");
@@ -137,6 +139,56 @@ playPauseButton.style.color = "white";
 playPauseButton.style.border = "none";
 playPauseButton.style.cursor = "not-allowed";
 document.body.appendChild(playPauseButton);
+
+// Gesture Control ON/OFF 버튼 생성 (초기 상태: ON)
+const gestureControlButton = document.createElement("button");
+gestureControlButton.textContent = "Gesture Control ON";  // 기본 상태
+gestureControlButton.style.position = "absolute";
+gestureControlButton.style.top = "30px";
+gestureControlButton.style.left = "200px";
+gestureControlButton.style.padding = "20px 40px";
+gestureControlButton.style.fontSize = "24px";
+gestureControlButton.style.fontWeight = "bold";
+gestureControlButton.style.backgroundColor = "purple";  // ON 상태일 때 보라색
+gestureControlButton.style.color = "white";
+gestureControlButton.style.border = "none";
+gestureControlButton.style.cursor = "pointer";
+document.body.appendChild(gestureControlButton);
+
+let webcamWindow = null; // 웹캠 창 저장
+
+// 🟣 Gesture Control 버튼 클릭 시 웹캠 새 창 실행 or 종료
+gestureControlButton.addEventListener("click", () => {
+    if (webcamWindow && !webcamWindow.closed) {
+        // 웹캠 창이 열려 있다면 종료
+        webcamWindow.close();
+        webcamWindow = null;
+        gestureControlButton.textContent = "Gesture Control ON";
+        gestureControlButton.style.backgroundColor = "purple";
+        console.log("🛑 Gesture Control 종료");
+    } else {
+        // 웹캠 창 새로 열기
+        webcamWindow = window.open("/visualizer/webcam.html", "_blank", "width=400,height=300");
+
+        if (webcamWindow) {
+            gestureControlButton.textContent = "Gesture Control OFF";
+            gestureControlButton.style.backgroundColor = "gray";
+            console.log("✅ Gesture Control 실행");
+        } else {
+            console.error("❌ 팝업 차단으로 인해 새 창을 열 수 없습니다.");
+            alert("🚨 팝업 차단을 허용해주세요!");
+        }
+    }
+});
+
+// 🛑 부모 창이 닫힐 때 웹캠 창도 자동으로 닫기
+window.addEventListener("beforeunload", () => {
+    if (webcamWindow && !webcamWindow.closed) {
+        console.log("🚪 부모 창 닫힘 → 웹캠 창 자동 종료");
+        webcamWindow.close();
+    }
+});
+
 
 // JWT 토큰을 포함하여 서버에서 오디오 파일 가져오기
 const fetchAudioWithJWT = async (url) => {
@@ -206,83 +258,55 @@ window.onload = async function () {
 
         let audioContextStartTime = 0; // 오디오 재생 시작 시간
 
-        playPauseButton.addEventListener("click", async() => {
-            if (playPauseButton.textContent === "Replay") {
-                // 음악 처음부터 다시 재생
-                console.log("🔄 음악 다시 재생");
-
-                // 오디오가 이미 실행 중이라면 정지
-                if (sound.isPlaying) {
-                    sound.stop();
-                    await new Promise(resolve => setTimeout(resolve, 50)); // 비동기적 대기를 통해 정확한 음악 재생
-                }
-
-                currentPlaybackTime = 0; // 처음부터 재생하기 위한 셋업
-                sound.offset = 0; // 0초부터 시작 강제 지정
-                sound.play(); // 재생 실행
-
-                setTimeout(() => { 
-                    /*
-                        - Web Audio Api의 비동기적 특성으로 `sound.play()` 실행 직후 `context.currentTime`을 읽으면 부정확할 수 있음
-                        → setTimeout() 사용해 실제 오디오가 재생된 후 정확한 재생 시간 기록 + 사용자의 버튼 연타 시 발생하는 버그 수정
-                    */
-                    audioContextStartTime = sound.context.currentTime; // play() 실행 이후 정확한 시간 기록
-                    console.log(`🎯 audioContextStartTime이 0초로 설정됨`);
-                }, 50);
-                
-                isPlaying = true;
-                animate(); 
-        
-                playPauseButton.textContent = "Stop"; // 정지 버튼으로 변경
-                playPauseButton.style.backgroundColor = "#dc3545"; 
-                
-            } else if (!isPlaying) {
-                // ▶ 재생 모드
-                if (sound.context.state === "suspended") {
-                    sound.context.resume().then(() => {
-                        sound.offset = currentPlaybackTime;
-                        sound.play();
-                        audioContextStartTime = sound.context.currentTime - currentPlaybackTime;
-                        console.log(`▶ 음악 재생 (이전 위치: ${currentPlaybackTime.toFixed(2)}초)`);
-                        isPlaying = true;
-                        animate(); 
-
-                        playPauseButton.textContent = "Stop";
-                        playPauseButton.style.backgroundColor = "#dc3545"; 
-                    });
-            } else {
-                    sound.offset = currentPlaybackTime;
-                    sound.play();
-                    audioContextStartTime = sound.context.currentTime - currentPlaybackTime;
-                    console.log(`▶ 음악 재생 (이전 위치: ${currentPlaybackTime.toFixed(2)}초)`);
-                    isPlaying = true;
-                    animate(); 
-
-                    playPauseButton.textContent = "Stop";
-                    playPauseButton.style.backgroundColor = "#dc3545"; 
-                }
-            } else {
-                // ■ 정지 모드
-                currentPlaybackTime = sound.context.currentTime - audioContextStartTime;
-                sound.stop();
-                console.log(`🛑 음악 정지 (저장된 위치: ${currentPlaybackTime.toFixed(2)}초)`);
-                isPlaying = false;
-
-                if (animateFrameId) {
-                    cancelAnimationFrame(animateFrameId);
-                    console.log("🎥 애니메이션 루프 종료!");
-                }
-
-                bloomComposer.render(); // 정지 후 마지막 프레임 유지
-                playPauseButton.textContent = "Play";
-                playPauseButton.style.backgroundColor = "#28a745"; 
-            }
         });
-    });
 };
 
-// 음악 종료 시 Replay 버튼으로 변경
+// 음악 재생
+function playMusic() {
+    if (playPauseButton.textContent === "Replay") {
+        console.log("🔄 Replay 버튼 클릭됨 → 음악 처음부터 재생");
+        sound.stop();
+        currentPlaybackTime = 0;
+
+        // 🎨 Replay 버튼 스타일 초기화 (Play 버튼처럼 변경)
+        playPauseButton.textContent = "Stop";
+        playPauseButton.style.backgroundColor = "#dc3545"; 
+        playPauseButton.style.color = "white";
+    }
+
+    if (sound.isPlaying) return;
+    console.log("▶ 음악 재생");
+    sound.offset = currentPlaybackTime;
+    sound.play();
+    audioContextStartTime = sound.context.currentTime - currentPlaybackTime;
+    isPlaying = true;
+    animate();
+
+    playPauseButton.textContent = "Stop";
+    playPauseButton.style.backgroundColor = "#dc3545";
+    playPauseButton.style.color = "white";
+}
+
+// 음악 정지
+function pauseMusic() {
+    if (!sound.isPlaying) return;
+    console.log("⏸ 음악 정지");
+    currentPlaybackTime = sound.context.currentTime - audioContextStartTime;
+    sound.stop();
+    isPlaying = false;
+
+    playPauseButton.textContent = "Play";
+    playPauseButton.style.backgroundColor = "#28a745";
+    playPauseButton.style.color = "white";
+}
+
+// Play/Pause 버튼 이벤트
+playPauseButton.addEventListener("click", () => isPlaying ? pauseMusic() : playMusic());
+
+// 음악 종료 시 Replay 버튼으로 변경 (재생 중에는 실행 안 됨)
 sound.onEnded = function () {
+    if (!isPlaying) return; // 종료 이벤트 중복 방지
+
     console.log("🎵 음악이 끝났습니다. Replay 버튼으로 변경");
 
     playPauseButton.textContent = "Replay";
@@ -293,6 +317,26 @@ sound.onEnded = function () {
     isPlaying = false;
     currentPlaybackTime = 0; // 재생 위치 초기화
 };
+
+
+// 제스처 이벤트 감지 (웹캠 창에서 신호 수신)
+window.addEventListener("message", (event) => {
+    if (event.data.action === "gesture") {
+        console.log(`📩 제스처 감지: ${event.data.gesture}`);
+        if (event.data.gesture === "play") playMusic();
+        if (event.data.gesture === "pause") pauseMusic();
+    }
+});
+
+// 웹캠 창이 닫히면 자동 정리
+setInterval(() => {
+    if (webcamWindow && webcamWindow.closed) {
+        webcamWindow = null;
+        gestureControlButton.textContent = "Gesture Control ON";
+        gestureControlButton.style.backgroundColor = "purple";
+    }
+}, 1000);
+
 
 // 초기 장면을 렌더링 (흰 화면 방지)
 function initialRender() {

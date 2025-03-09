@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Gesture Control</title>
+</head>
+<body>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
+
+    <script>
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        let camera = null;
+
+        async function startWebcam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                console.log("✅ 웹캠 실행됨!");
+            } catch (error) {
+                console.error("❌ 웹캠 실행 실패:", error);
+            }
+        }
+
+        function detectGesture(landmarks) {
+            const wrist = landmarks[0];
+            const indexTip = landmarks[8];
+            const middleTip = landmarks[12];
+            const ringTip = landmarks[16];
+            const pinkyTip = landmarks[20];
+            const thumbTip = landmarks[4];
+
+            const isFist =
+                indexTip.y > wrist.y &&
+                middleTip.y > wrist.y &&
+                ringTip.y > wrist.y &&
+                pinkyTip.y > wrist.y &&
+                Math.abs(thumbTip.x - indexTip.x) < 0.05;  // 엄지가 검지와 가까울 때
+
+            const isPalmOpen =
+                indexTip.y < wrist.y &&
+                middleTip.y < wrist.y &&
+                ringTip.y < wrist.y &&
+                pinkyTip.y < wrist.y &&
+                Math.abs(thumbTip.x - indexTip.x) > 0.1;  // 엄지가 검지와 멀 때
+
+            if (isFist) return "pause";
+            if (isPalmOpen) return "play";
+            return "none";
+        }
+
+        function sendGestureToParent(gesture) {
+            if (window.opener) {
+                console.log(`📡 부모 창에 제스처 전송: ${gesture}`);
+                window.opener.postMessage({ action: "gesture", gesture }, "*");
+            }
+        }
+
+        async function startGestureRecognition() {
+            const hands = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+            });
+
+            hands.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.8,
+                minTrackingConfidence: 0.8,
+            });
+
+            hands.onResults((results) => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (results.multiHandLandmarks.length > 0) {
+                    const landmarks = results.multiHandLandmarks[0];
+                    drawConnectors(ctx, landmarks, Hands.HAND_CONNECTIONS, { color: "#00FF00", lineWidth: 2 });
+                    drawLandmarks(ctx, landmarks, { color: "#FF0000", lineWidth: 1 });
+
+                    const detectedGesture = detectGesture(landmarks);
+                    sendGestureToParent(detectedGesture);
+                }
+            });
+
+            camera = new Camera(video, {
+                onFrame: async () => {
+                    await hands.send({ image: video });
+                },
+                width: 640,
+                height: 480,
+            });
+
+            camera.start();
+        }
+
+        startWebcam();
+        startGestureRecognition();
+
+        // 🛑 창이 닫힐 때 웹캠 스트림 정리
+        window.addEventListener("beforeunload", () => {
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+            if (camera) {
+                camera.stop();
+            }
+        });
+    </script>
+</body>
+</html>
