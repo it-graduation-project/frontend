@@ -77,7 +77,7 @@ const Visualizer = ({ audioUrl }) => {
     return () => window.removeEventListener("message", handleGestureMessage);
   }, []);
 
-  // ✅ FFT 데이터를 시각화 창에서 분석 후 React로 전송
+  // FFT 데이터를 시각화 창에서 분석 후 React로 전송
   useEffect(() => {
     const handleFFTResponse = (event) => {
       if (event.data.type === "fftData") {

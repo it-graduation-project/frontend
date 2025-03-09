@@ -145,8 +145,8 @@ const Navbar = () => {
         message="All visualizations will be closed."
         confirmText="Log Out"
         cancelText="Cancel"
-        onConfirm={handleConfirmLogout} // ✅ 로그아웃 확정 버튼 누르면 실행
-        onClose={() => setIsLogoutPopupOpen(false)} // ✅ 팝업 닫기
+        onConfirm={handleConfirmLogout} // 로그아웃 확정 버튼 누르면 실행
+        onClose={() => setIsLogoutPopupOpen(false)} // 팝업 닫기
       />
     </>
   );
