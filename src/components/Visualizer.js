@@ -45,6 +45,22 @@ const Visualizer = ({ audioUrl }) => {
     };
   }, [audioUrl]);
 
+  useEffect(() => {
+    const handleWebcamMessage = (event) => {
+      if (event.data.type === "webcamOpened") {
+        
+        console.log("📡 웹캠 창 열림 메시지 수신됨");
+      } else if (event.data.type === "webcamClosed") {
+        
+        console.log("📡 웹캠 창 닫힘 메시지 수신됨");
+      }
+    };
+  
+    window.addEventListener("message", handleWebcamMessage);
+  
+    return () => window.removeEventListener("message", handleWebcamMessage);
+  }, []);
+
   // 제스처 데이터 수신 (webcam.html → visualizer 창)
   useEffect(() => {
     const handleGestureMessage = (event) => {

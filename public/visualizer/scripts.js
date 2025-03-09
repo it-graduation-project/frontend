@@ -166,6 +166,9 @@ gestureControlButton.addEventListener("click", () => {
         gestureControlButton.textContent = "Gesture Control ON";
         gestureControlButton.style.backgroundColor = "purple";
         console.log("🛑 Gesture Control 종료");
+
+        // 웹캠 종료됨 메시지 React로 전송 
+        window.opener?.postMessage({ type: "webcamClosed" }, "*");
     } else {
         // 웹캠 창 새로 열기
         webcamWindow = window.open("/visualizer/webcam.html", "_blank", "width=400,height=300");
@@ -174,6 +177,9 @@ gestureControlButton.addEventListener("click", () => {
             gestureControlButton.textContent = "Gesture Control OFF";
             gestureControlButton.style.backgroundColor = "gray";
             console.log("✅ Gesture Control 실행");
+
+            // 웹캠 열림 메시지 React로 전송 
+            window.opener?.postMessage({ type: "webcamOpened" }, "*");
         } else {
             console.error("❌ 팝업 차단으로 인해 새 창을 열 수 없습니다.");
             alert("🚨 팝업 차단을 허용해주세요!");
@@ -181,11 +187,12 @@ gestureControlButton.addEventListener("click", () => {
     }
 });
 
-// 🛑 부모 창이 닫힐 때 웹캠 창도 자동으로 닫기
+// 🛑 시각화 창 닫힐 때 웹캠 창 자동 닫기
 window.addEventListener("beforeunload", () => {
     if (webcamWindow && !webcamWindow.closed) {
         console.log("🚪 부모 창 닫힘 → 웹캠 창 자동 종료");
         webcamWindow.close();
+        webcamWindow = null;
     }
 });
 
@@ -406,7 +413,29 @@ window.addEventListener('resize', function() {
     }
 });
 
-// ✅ React에서 블루투스 상태를 받을 수 있도록 설정
+// 부모 창(Navbar)에서 로그아웃 시 메시지로 웹캠 창 닫기
+window.addEventListener("message", (event) => {
+    if (event.data.action === "closeWebcam") {
+        if (webcamWindow && !webcamWindow.closed) {
+            webcamWindow.close();
+            webcamWindow = null;
+            gestureControlButton.textContent = "Gesture Control ON";
+            gestureControlButton.style.backgroundColor = "purple";
+            console.log("🚪 메시지 수신 → 웹캠 창 자동 종료");
+        }
+    }
+});
+
+// 시각화 창 닫힐 시 웹캠 창도 닫힐 수 있도록 설정
+window.addEventListener('unload', () => {
+    if (webcamWindow && !webcamWindow.closed) {
+        webcamWindow.close();
+        webcamWindow = null;
+        console.log("🚪 시각화 창 닫힘 → 웹캠 창 자동 종료");
+    }
+}); 
+
+// React에서 블루투스 상태를 받을 수 있도록 설정
 window.addEventListener("message", (event) => {
     if (event.data.type === "bluetoothStatus") {
         console.log(`💡 Bluetooth Status: ${event.data.status}`);

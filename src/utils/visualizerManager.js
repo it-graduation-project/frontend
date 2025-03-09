@@ -6,15 +6,28 @@
 */
 
 export const visualizerWindows = [];
+export let webcamWindow = null; 
+
+export const setWebcamWindow = (win) => {
+  webcamWindow = win;
+};
 
 // 열린 모든 시각화 창 닫기 (로그아웃, 음악 교체 시 호출됨)
 export const closeAllVisualizerWindows = () => {
+  console.log("🛑 모든 시각화 창 닫기");
+
   visualizerWindows.forEach((win) => {
     if (win && !win.closed) {
       win.close();
     }
   });
   visualizerWindows.length = 0; // 배열 초기화
+
+  if (webcamWindow && !webcamWindow.closed) {
+    console.log("🚪 웹캠 창도 닫음");
+    webcamWindow.close();
+    webcamWindow = null;
+  }
 };
 
 // 불필요한 창 제거 함수
@@ -23,5 +36,9 @@ export const cleanupVisualizerWindows = () => {
     if (!visualizerWindows[i] || visualizerWindows[i].closed) {
       visualizerWindows.splice(i, 1);
     }
+  }
+
+  if (webcamWindow && webcamWindow.closed) {
+    webcamWindow = null;
   }
 };
