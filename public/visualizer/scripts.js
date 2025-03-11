@@ -39,10 +39,24 @@ function detectBeat() {
     sendFFTDataToReact(enhancedValue); // React로 전송
 }
 
-// 100ms마다 FFT 분석 후 React로 데이터 전송
-setInterval(() => {
-    detectBeat();
-}, 100);
+let fftInterval = null;
+
+function startFFTStreaming() {
+    if (fftInterval) return;  // 이미 실행 중이면 중복 실행 방지
+
+    console.log("🎵 FFT 데이터 스트리밍 시작!");
+    fftInterval = setInterval(() => {
+        if (isPlaying) detectBeat(); // ✅ 음악이 재생 중일 때만 FFT 데이터 전송
+    }, 100);
+}
+
+function stopFFTStreaming() {
+    if (fftInterval) {
+        clearInterval(fftInterval);
+        fftInterval = null;
+        console.log("⏹ FFT 데이터 스트리밍 중지!");
+    }
+}
 
 // Three.js 렌더러 설정
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -285,6 +299,11 @@ function playMusic() {
     isPlaying = true;
     animate();
 
+    startFFTStreaming(); // ✅ 음악 재생 시 FFT 데이터 전송 시작
+
+    // React에 재생 상태 전달
+    window.opener?.postMessage({ type: "musicStatus", status: "playing" }, "*");
+
     playPauseButton.textContent = "Stop";
     playPauseButton.style.backgroundColor = "#dc3545";
     playPauseButton.style.color = "white";
@@ -297,6 +316,11 @@ function pauseMusic() {
     currentPlaybackTime = sound.context.currentTime - audioContextStartTime;
     sound.stop();
     isPlaying = false;
+
+    stopFFTStreaming(); // ✅ 음악 정지 시 FFT 데이터 전송 중단
+
+    // React에 정지 상태 전달
+    window.opener?.postMessage({ type: "musicStatus", status: "paused" }, "*");
 
     playPauseButton.textContent = "Play";
     playPauseButton.style.backgroundColor = "#28a745";

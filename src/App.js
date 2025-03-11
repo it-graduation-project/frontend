@@ -45,6 +45,21 @@ function App() {
     return () => window.removeEventListener("message", handleFFTData);
   }, []);
 
+  useEffect(() => {
+    function handleMusicStatus(event) {
+        if (event.data.type === "musicStatus") {
+            if (event.data.status === "playing") {
+                if (getBluetoothStatus()) startStreamingFFTData(); // ✅ 음악이 재생되면 FFT 데이터 전송 시작
+            } else if (event.data.status === "paused") {
+                stopStreamingFFTData(); // ✅ 음악이 멈추면 FFT 데이터 전송 중단
+            }
+        }
+    }
+
+    window.addEventListener("message", handleMusicStatus);
+    return () => window.removeEventListener("message", handleMusicStatus);
+  }, []);
+
   return (
     <div className="App">
       {/* 네비게이션 바 */}
@@ -80,9 +95,6 @@ function App() {
       {/* 파일 업로드 섹션 */}
       <FileUpload onFileUpload={(url) => {
         setAudioUrl(url);
-        if (getBluetoothStatus()) {
-          startStreamingFFTData();
-        }
       }} />
 
       {/* 업로드된 음악이 있으면 시각화 실행 */}

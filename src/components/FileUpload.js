@@ -12,7 +12,6 @@ import "../styles/FileUpload.css";
 import uploadIconImage from "../images/upload-icon.png";
 import ActionPopup from "./ActionPopup";
 import { cleanupVisualizerWindows, visualizerWindows, closeAllVisualizerWindows } from "../utils/visualizerManager";
-import { startStreamingFFTData, getBluetoothStatus } from "../utils/bluetoothManager";
 
 const FileUpload = ({ onFileUpload }) => {
   const [isDragOver, setIsDragOver] = useState(false); // 파일 드래그 중 여부
@@ -125,11 +124,6 @@ const FileUpload = ({ onFileUpload }) => {
           closeAllVisualizerWindows(); // ✅ 기존 시각화 창 닫기
           setAudioUrl(data.fileUrl); // ✅ 새로운 음악 URL 설정
           onFileUpload(data.fileUrl);
-
-          // ✅ 블루투스 연결 확인 후 FFT 데이터 스트리밍 시작
-          if (getBluetoothStatus()) {
-            startStreamingFFTData();
-          }
       } else {
           console.error("🛑 FileUpload.js - 서버 응답 오류:", data);
       }
