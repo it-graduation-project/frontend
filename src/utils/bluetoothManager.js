@@ -81,14 +81,31 @@ function handleDisconnect() {
 }
 
 // ✅ FFT 데이터를 ESP32로 전송하는 함수
-export const sendFFTDataToESP32 = async (value) => {
+export const sendFFTDataToESP32 = async (value, prevValue) => {
   if (!isConnected || !bluetoothCharacteristic) return;
   try {
-    let data = new Uint8Array([value]); // 0~255 범위 유지
-    await bluetoothCharacteristic.writeValue(data);
-    console.log(`📡 Sent FFT Data: ${value}`);
+      let pulsedValue = value;  // 기본값 설정
+      let diff = Math.abs(value - prevValue);  // 이전 값과의 차이 계산
+
+      // 🟢 **리듬 차이가 원래 작은 경우(100 이하) → 증폭하여 강조**
+      if (diff < 100) {
+          if (value > 100) {
+              pulsedValue = Math.min(255, Math.floor(value * 1.3));  // 30% 증폭
+          } else {
+              pulsedValue = Math.min(100, value * 1.5);  // 최소 100 보장
+          }
+      }
+
+      // 🔴 **리듬 차이가 원래 큰 경우(100 이상) → 증폭 최소화 (원래 차이를 유지)**
+      else {
+          pulsedValue = value;  // 원래 값 그대로 유지
+      }
+
+      let data = new Uint8Array([pulsedValue]);
+      await bluetoothCharacteristic.writeValue(data);
+      console.log(`📡 PWM 신호 전송됨: 진동 강도 = ${pulsedValue} (0~255)`);
   } catch (error) {
-    console.error("❌ FFT 데이터 전송 실패:", error);
+      console.error("❌ FFT 데이터 전송 실패:", error);
   }
 };
 
