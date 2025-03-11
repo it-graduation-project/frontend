@@ -28,19 +28,15 @@ function sendFFTDataToReact(value) {
 function detectBeat() {
     if (!analyser) return;
 
-    let freqData = analyser.getFrequencyData();
-    let sum = 0;
-    let count = 0;
+    let frequencyValue = analyser.getAverageFrequency();
 
-    // 50Hz ~ 200Hz 대역의 평균값 계산
-    for (let i = 5; i < 20; i++) {
-        sum += freqData[i];
-        count++;
-    }
-    let avg = sum / count;
+    let scaleFactor = 2.0;  // 🔥 진동 강도 증폭 (1.5~2.5 조정 가능)
+    let minVibrationThreshold = 50;  // 🔥 최소 진동 강도 (너무 약한 진동 무시)
 
-    // React에 FFT 데이터 전달
-    sendFFTDataToReact(avg);
+    let enhancedValue = Math.pow(frequencyValue / 255, 1.3) * 255 * scaleFactor;  // 🚀 강도 증폭
+    enhancedValue = Math.min(255, Math.max(minVibrationThreshold, enhancedValue));  // ✅ 최소값 보장
+
+    sendFFTDataToReact(enhancedValue); // React로 전송
 }
 
 // 100ms마다 FFT 분석 후 React로 데이터 전송
@@ -368,7 +364,8 @@ function animate() {
     if (analyser && sound.isPlaying) {
         const frequencyValue = analyser.getAverageFrequency();
         if (frequencyValue > 0) {
-            uniforms.u_frequency.value = frequencyValue;
+            let enhancedValue = Math.pow(frequencyValue / 255, 1.3) * 300; // 기존보다 변화량 증폭
+            uniforms.u_frequency.value = enhancedValue;
         }
     }
 

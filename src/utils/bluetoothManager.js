@@ -11,7 +11,6 @@ let bluetoothServer = null;
 let bluetoothCharacteristic = null;
 let isConnected = false;
 let fftStreamingInterval = null;
-let enableAutoReconnect = true; // ✅ 자동 재연결 옵션 추가
 
 // ✅ 블루투스 연결 함수
 export const connectBluetooth = async () => {
@@ -85,7 +84,7 @@ function handleDisconnect() {
 export const sendFFTDataToESP32 = async (value) => {
   if (!isConnected || !bluetoothCharacteristic) return;
   try {
-    let data = new Uint8Array([value]);
+    let data = new Uint8Array([value]); // 0~255 범위 유지
     await bluetoothCharacteristic.writeValue(data);
     console.log(`📡 Sent FFT Data: ${value}`);
   } catch (error) {

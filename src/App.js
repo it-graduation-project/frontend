@@ -38,7 +38,7 @@ function App() {
   useEffect(() => {
     const handleFFTData = (event) => {
       if (event.data.type === "fftData" && getBluetoothStatus()) {
-        sendFFTDataToESP32(Math.min(255, Math.floor(event.data.value)));
+        sendFFTDataToESP32(Math.floor(event.data.value));
       }
     };
     window.addEventListener("message", handleFFTData);
