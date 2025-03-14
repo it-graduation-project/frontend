@@ -81,29 +81,34 @@ function handleDisconnect() {
 }
 
 // ✅ FFT 데이터를 ESP32로 전송하는 함수
-export const sendFFTDataToESP32 = async (value, prevValue) => {
-  if (!isConnected || !bluetoothCharacteristic) return;
-  try {
-      let pulsedValue = value;  // 기본값 설정
-      let diff = Math.abs(value - prevValue);  // 이전 값과의 차이 계산
+let previousFFTValue = 0; // 🔥 이전 FFT 값을 저장하는 전역 변수 추가
 
-      // 🟢 **리듬 차이가 원래 작은 경우(100 이하) → 증폭하여 강조**
-      if (diff < 100) {
-          if (value > 100) {
-              pulsedValue = Math.min(255, Math.floor(value * 1.3));  // 30% 증폭
-          } else {
-              pulsedValue = Math.min(100, value * 1.5);  // 최소 100 보장
-          }
+export const sendFFTDataToESP32 = async (value) => {
+  if (!isConnected || !bluetoothCharacteristic) return;
+
+  try {
+      let diff = value - previousFFTValue; // 🔥 변화량 (부호 포함)
+      let pulsedValue;
+
+      // ✅ 변화량이 10 미만이면 전송 생략 (BLE 과부하 방지)
+      if (Math.abs(diff) < 10) {
+          return; // ❌ writeValue() 호출하지 않음
       }
 
-      // 🔴 **리듬 차이가 원래 큰 경우(100 이상) → 증폭 최소화 (원래 차이를 유지)**
-      else {
-          pulsedValue = value;  // 원래 값 그대로 유지
+      // ✅ 비트가 강해질 때 (⬆ 상승, diff > 0) → 진동을 더 극대화
+      if (diff > 0) {  
+          pulsedValue = Math.min(255, Math.floor(value * 2)); // 최대값 255 제한
+      }
+      // ✅ 비트가 약해질 때 (⬇ 하강, diff < 0) → 진동을 극적으로 낮춤
+      else { 
+          pulsedValue = Math.max(5, Math.floor(value * 0.3)); // 최소값 5 제한
       }
 
       let data = new Uint8Array([pulsedValue]);
       await bluetoothCharacteristic.writeValue(data);
-      console.log(`📡 PWM 신호 전송됨: 진동 강도 = ${pulsedValue} (0~255)`);
+      console.log(`🔵 value: ${value} / pulsedValue: ${pulsedValue}, 변화량: ${diff}`);
+
+      previousFFTValue = value; // ✅ 현재 값을 저장해서 다음 호출 시 비교 기준으로 사용
   } catch (error) {
       console.error("❌ FFT 데이터 전송 실패:", error);
   }
