@@ -5,7 +5,7 @@
   - Three.js를 사용하여 3D 객체와 후처리 효과 적용
   - Web Audio API와 연동하여 음악 분석 및 시각적 반응 구현
   - 사용자 인터랙션 (재생/정지 버튼, 마우스 입력, GUI 조절) 지원
-  - FFT 데이터를 React로 전달하여 블루투스 제어 가능
+  - FFT 데이터를 React로 전달하여 Bluetooth Classic을 통해 ESP32에 전송
 */
 
 console.log("✅ scripts.js 실행됨!");
@@ -40,7 +40,7 @@ function startFFTStreaming() {
     console.log("🎵 FFT 데이터 스트리밍 시작!");
     fftInterval = setInterval(() => {
         if (isPlaying) detectBeat(); // ✅ 음악이 재생 중일 때만 FFT 데이터 전송
-    }, 100);
+    }, 10); // 조절요소
 }
 
 function stopFFTStreaming() {
@@ -367,10 +367,17 @@ initialRender();
 // 애니메이션 루프 (재생 중일 때만 실행)
 const clock = new THREE.Clock();
 let animateFrameId;
+// let lastFrameTime = performance.now(); // 🔥 마지막 프레임 시간 저장
 
 function animate() {
     if (!isPlaying) return;
     animateFrameId = requestAnimationFrame(animate);
+
+    // let now = performance.now();
+    // let frameTime = now - lastFrameTime; // 🔥 프레임 간격(ms) 계산
+    // lastFrameTime = now;
+
+    // console.log(`🎨 시각화 애니메이션 업데이트 간격: ${frameTime.toFixed(2)}ms`);
 
     camera.position.x += (mouseX - camera.position.x) * 0.05;
     camera.position.y += (-mouseY - camera.position.y) * 0.5;
@@ -381,6 +388,7 @@ function animate() {
     if (analyser && sound.isPlaying) {
         const frequencyValue = analyser.getAverageFrequency();
         if (frequencyValue > 0) {
+            // 조절요소
             let enhancedValue = Math.pow(frequencyValue / 255, 1.3) * 300; // 기존보다 변화량 증폭
             uniforms.u_frequency.value = enhancedValue;
         }

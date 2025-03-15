@@ -1,112 +1,146 @@
 /*
-  bluetoothManager.js - 블루투스 연결 및 FFT 데이터 전송 관리
+  bluetoothManager.js - 블루투스 연결 및 FFT 데이터 전송 관리 (Bluetooth Classic 버전)
   -------------------------------------------------
-  - Web Bluetooth API를 사용하여 ESP32와 연결
+  - Web Serial API를 사용하여 ESP32와 연결
   - FFT 분석 데이터를 ESP32로 전송하여 진동 모터를 제어
   - 블루투스 연결 상태를 시각화 창과 동기화
 */
 
-let bluetoothDevice = null;
-let bluetoothServer = null;
-let bluetoothCharacteristic = null;
-let isConnected = false;
+let serialPort = null;  // 🔥 Bluetooth Classic Serial Port
+let serialWriter = null;  // 🔥 데이터 전송을 위한 writer
+let isConnected = false;  
 let fftStreamingInterval = null;
 
-// ✅ 블루투스 연결 함수
-export const connectBluetooth = async () => {
+// ✅ Bluetooth Classic 연결 함수 (BLE 대신 Serial API 사용)
+export const connectBluetoothClassic = async () => {
   try {
-    console.log("🔍 Searching for ESP32 Bluetooth device...");
+    console.log("🔍 Searching for Bluetooth Classic device...");
 
-    // ✨ 기존 블루투스 연결이 있으면 먼저 해제
-    if (bluetoothDevice) {
-      console.warn("⚠️ Existing Bluetooth device found. Disconnecting...");
-      disconnectBluetooth();
+    // ✨ HTTPS 환경 체크 (Serial API는 HTTPS에서만 동작)
+    if (window.isSecureContext === false) {
+      console.error("❌ Bluetooth Classic requires HTTPS. Please use a secure connection.");
+      alert("🚨 Bluetooth Classic requires HTTPS. Please access the site via HTTPS.");
+      return false;
     }
 
-    bluetoothDevice = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
-      optionalServices: ["12345678-1234-5678-1234-56789abcdef0"],
-    });
+    // ✨ 기존 Serial 연결이 있으면 먼저 해제
+    if (serialPort) {
+      console.warn("⚠️ Existing Bluetooth Classic device found. Disconnecting...");
+      disconnectBluetoothClassic();
+    }
 
-    bluetoothDevice.addEventListener("gattserverdisconnected", handleDisconnect); // ✅ 연결 끊김 감지 추가
+    // ✅ Bluetooth Classic 장치 검색 (ESP32 전용 필터 추가)
+    console.log("📡 Requesting Bluetooth Serial device...");
+    serialPort = await navigator.serial.requestPort(); // ❗ 필터 제거
 
-    bluetoothServer = await bluetoothDevice.gatt.connect();
-    const service = await bluetoothServer.getPrimaryService("12345678-1234-5678-1234-56789abcdef0");
-    bluetoothCharacteristic = await service.getCharacteristic("abcd1234-5678-9876-5432-10abcdef1234");
+    if (!serialPort) {
+      console.error("❌ No compatible device found!");
+      alert("🚨 No compatible Bluetooth Classic device found. Please check your connection.");
+      return false;
+    }
 
+    // ✅ Serial 포트 열기 (Baudrate 설정)
+    await serialPort.open({ baudRate: 115200 });
+
+    serialWriter = serialPort.writable.getWriter(); // ✅ 데이터 전송을 위한 writer 생성
     isConnected = true;
-    console.log("✅ Connected to device:", bluetoothDevice.name);
+
+    console.log("✅ Connected to Bluetooth Classic device!");
     notifyVisualizer("connected");
-    
+
+    // ✅ 연결 감지 (연결이 끊어지면 handleDisconnect() 호출)
+    readLoop();
+
     return true;
   } catch (error) {
-    console.error("❌ Bluetooth connection failed:", error);
+    console.error("❌ Bluetooth Classic connection failed:", error);
     return false;
   }
 };
 
-// ✅ 블루투스 연결 해제 함수
-export const disconnectBluetooth = async () => {
-  if (bluetoothDevice) {
-    console.log("🔴 Disconnecting Bluetooth...");
-
-    if (bluetoothDevice?.gatt?.connected) {
-      bluetoothDevice.gatt.disconnect();
-    }
-
-    bluetoothDevice = null;  // ✅ 기존 블루투스 객체 초기화
+// ✅ Bluetooth Classic 연결 해제 함수
+export const disconnectBluetoothClassic = async () => {
+  if (serialWriter) {
+    await serialWriter.close();
+    serialWriter = null;
   }
-
+  if (serialPort) {
+    const reader = serialPort.readable.getReader();
+    await reader.cancel(); // ✅ 읽기 작업 중단
+    await reader.releaseLock(); // ✅ 리소스 해제
+    await serialPort.close();
+    serialPort = null;
+  }
+  
   isConnected = false;
   stopStreamingFFTData();
   notifyVisualizer("disconnected");
 
-  // ✨ BLE Adapter를 강제 리프레시하여 ESP32가 다시 검색되도록 함
-  const available = await navigator.bluetooth.getAvailability();
-  if (available) {
-    console.log("🔄 Bluetooth adapter refreshed. Ready for reconnection.");
-  } else {
-    console.warn("⚠️ Bluetooth adapter not available.");
-  }
+  console.log("🔴 Bluetooth Classic 연결 해제됨");
 };
 
-// ✅ 연결 끊김 감지 핸들러 (자동 재연결 방지)
-function handleDisconnect() {
-  console.warn("⚠️ Bluetooth connection lost!");
+// ✅ Bluetooth Classic 연결 감지 핸들러 (연결 끊김 감지)
+async function handleDisconnect() {
+  console.warn("⚠️ Bluetooth Classic connection lost!");
   isConnected = false;
   notifyVisualizer("disconnected");
 
-  // ✨ 자동 재연결을 막고, 새로운 기기 검색을 위해 기존 객체 제거
-  bluetoothDevice = null;
+  try {
+    if (serialPort) {
+      await serialPort.close();
+      serialPort = null;
+    }
+  } catch (error) {
+    console.error("❌ Serial Port close error:", error);
+  }
 }
 
-// ✅ FFT 데이터를 ESP32로 전송하는 함수
+// ✅ Bluetooth Classic 연결 감지 루프 (끊어지면 자동으로 handleDisconnect() 호출)
+async function readLoop() {
+  try {
+    const reader = serialPort.readable.getReader();
+    while (true) {
+      const { done } = await reader.read();
+      if (done) {
+        console.warn("⚠️ Serial connection lost!");
+        handleDisconnect();
+        break;
+      }
+    }
+  } catch (error) {
+    console.error("❌ Error in readLoop:", error);
+    handleDisconnect();
+  }
+}
+
+// ✅ FFT 데이터를 ESP32로 전송하는 함수 (BLE → Serial Write 변경)
 let previousFFTValue = 0; // 🔥 이전 FFT 값을 저장하는 전역 변수 추가
 
 export const sendFFTDataToESP32 = async (value) => {
-  if (!isConnected || !bluetoothCharacteristic) return;
+  if (!isConnected || !serialWriter) return;
 
   try {
       let diff = value - previousFFTValue; // 🔥 변화량 (부호 포함)
       let pulsedValue;
 
-      // ✅ 변화량이 10 미만이면 전송 생략 (BLE 과부하 방지)
-      if (Math.abs(diff) < 10) {
-          return; // ❌ writeValue() 호출하지 않음
+      // 조절요소
+      // ✅ 변화량이 7 미만이면 전송 생략 (Serial 과부하 방지)
+      if (Math.abs(diff) < 7) {
+          return; // ❌ write() 호출하지 않음
       }
 
       // ✅ 비트가 강해질 때 (⬆ 상승, diff > 0) → 진동을 더 극대화
       if (diff > 0) {  
-          pulsedValue = Math.min(255, Math.floor(value * 2)); // 최대값 255 제한
+          pulsedValue = Math.min(255, Math.floor(value * 2.3)); // 최대값 255 제한
       }
       // ✅ 비트가 약해질 때 (⬇ 하강, diff < 0) → 진동을 극적으로 낮춤
       else { 
-          pulsedValue = Math.max(5, Math.floor(value * 0.3)); // 최소값 5 제한
+          pulsedValue = Math.max(5, Math.floor(value * 0.5)); // 최소값 5 제한
       }
 
       let data = new Uint8Array([pulsedValue]);
-      await bluetoothCharacteristic.writeValue(data);
-      console.log(`🔵 value: ${value} / pulsedValue: ${pulsedValue}, 변화량: ${diff}`);
+      await serialWriter.write(data); // ✅ Bluetooth Classic Serial Write 사용
+      console.log(`value: ${value} / pulsedValue: ${pulsedValue}, 변화량: ${diff}`);
 
       previousFFTValue = value; // ✅ 현재 값을 저장해서 다음 호출 시 비교 기준으로 사용
   } catch (error) {
@@ -121,7 +155,7 @@ export const startStreamingFFTData = () => {
   console.log("🎵 Starting FFT Data Streaming...");
   fftStreamingInterval = setInterval(() => {
     window.postMessage({ type: "requestFFT" }, "*");
-  }, 100);
+  }, 10); // 조절요소
 };
 
 // ✅ FFT 데이터 스트리밍 중단
@@ -135,7 +169,7 @@ export const stopStreamingFFTData = () => {
 
 // ✅ 블루투스 연결 상태 반환
 export const getBluetoothStatus = () => {
-  return isConnected && bluetoothDevice?.gatt?.connected;
+  return isConnected && serialPort !== null;
 };
 
 // ✅ 시각화 창에 블루투스 상태 전달 (PostMessage)
