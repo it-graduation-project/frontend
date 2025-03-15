@@ -41,4 +41,9 @@ export const cleanupVisualizerWindows = () => {
   if (webcamWindow && webcamWindow.closed) {
     webcamWindow = null;
   }
+
+  if (visualizerWindows.length === 0) {
+    console.log("🛑 모든 시각화 창이 닫혔습니다. UI 초기화 필요.");
+    window.opener?.postMessage({ type: "visualizerClosed" }, "*");  // 부모 창에 알림
+  }
 };

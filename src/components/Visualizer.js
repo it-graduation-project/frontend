@@ -12,7 +12,7 @@
 import React, { useEffect, useRef } from "react";
 import { cleanupVisualizerWindows, visualizerWindows } from "../utils/visualizerManager";
 
-const Visualizer = ({ audioUrl }) => {
+const Visualizer = ({ audioUrl, fileName }) => {
   const visualizerWindowRef = useRef(null);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const Visualizer = ({ audioUrl }) => {
     cleanupVisualizerWindows();
 
     // 새 창에서 Three.js 기반 비주얼라이저 실행
-    const visualizerUrl = `/visualizer/index.html?audioUrl=${encodeURIComponent(audioUrl)}`;
+    const visualizerUrl = `/visualizer/index.html?audioUrl=${encodeURIComponent(audioUrl)}&fileName=${encodeURIComponent(fileName)}`;
     console.log("🌐 새 창에서 시각화 실행:", visualizerUrl);
 
     const newVisualizerWindow = window.open(visualizerUrl, "_blank", "width=1200,height=800");
@@ -31,9 +31,17 @@ const Visualizer = ({ audioUrl }) => {
       visualizerWindowRef.current = newVisualizerWindow;
       visualizerWindows.push(newVisualizerWindow);
 
-      newVisualizerWindow.addEventListener("beforeunload", () => {
-        visualizerWindowRef.current = null;
-      });
+      newVisualizerWindow.opener = window;
+
+      const sendCloseMessage = () => {
+        if (window.opener) {
+          window.opener.postMessage({ type: "visualizerClosed" }, "*");
+          console.log("🚪 시각화 창이 닫힘 → 부모 창에 visualizerClosed 메시지 전송!");
+        }
+      };
+
+      newVisualizerWindow.addEventListener("beforeunload", sendCloseMessage);
+      newVisualizerWindow.addEventListener("unload", sendCloseMessage);
     } else {
       console.error("❌ 팝업 차단으로 인해 새 창을 열 수 없습니다.");
       alert("🚨 팝업 차단을 허용해주세요!");
@@ -41,6 +49,7 @@ const Visualizer = ({ audioUrl }) => {
     return () => {
       if (visualizerWindowRef.current && !visualizerWindowRef.current.closed) {
         visualizerWindowRef.current.close();
+        window.opener?.postMessage({ type: "visualizerClosed" }, "*"); // 부모 창으로 메시지 전송
       }
     };
   }, [audioUrl]);
@@ -93,8 +102,10 @@ const Visualizer = ({ audioUrl }) => {
       window.removeEventListener("message", handleFFTResponse);
     };
   }, []);
+  
 
   return null; // 시각화는 새 창에서 실행되므로 UI 요소 렌더링 없음
 };
 
 export default Visualizer;
+

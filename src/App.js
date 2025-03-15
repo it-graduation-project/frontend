@@ -27,6 +27,8 @@ function App() {
   const [token, setToken] = useState(null); // JWT 토큰 상태
   const [audioUrl, setAudioUrl] = useState(null); // 업로드된 음악 URL 상태
   const [popupData, setPopupData] = useState({ isOpen: false });
+  const [fileName, setFileName] = useState(null); // 추가
+
 
   // 애플리케이션 시작 시 로컬스토리지에서 JWT 토큰 확인
   useEffect(() => {
@@ -34,7 +36,7 @@ function App() {
     if (storedToken) setToken(storedToken);
   }, []);
 
-  // ✅ 시각화 창에서 FFT 데이터를 수신하고 블루투스로 전송
+  // 시각화 창에서 FFT 데이터를 수신하고 블루투스로 전송
   useEffect(() => {
     const handleFFTData = (event) => {
       if (event.data.type === "fftData" && getBluetoothStatus()) {
@@ -78,15 +80,17 @@ function App() {
        <HowToStart />
 
       {/* 파일 업로드 섹션 */}
-      <FileUpload onFileUpload={(url) => {
+      <FileUpload onFileUpload={(url, name) => {
         setAudioUrl(url);
+        setFileName(name);
         if (getBluetoothStatus()) {
           startStreamingFFTData();
         }
       }} />
 
       {/* 업로드된 음악이 있으면 시각화 실행 */}
-      {audioUrl && <Visualizer audioUrl={audioUrl} />}
+      {audioUrl && fileName && <Visualizer audioUrl={audioUrl} fileName={fileName} />}
+
 
       {/* 주요 기능 섹션 */}
       <KeyFeatures /> 
@@ -94,7 +98,7 @@ function App() {
       {/* 푸터 */}
       <Footer />
 
-      {/* ✅ 공통 ActionPopup 사용 (파일 교체 / 로그아웃) */}
+      {/* 공통 ActionPopup 사용 (파일 교체 / 로그아웃) */}
       <ActionPopup {...popupData} />
     </div>
   );

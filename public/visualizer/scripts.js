@@ -248,6 +248,14 @@ window.onload = async function () {
         return;
     }
 
+        // 🔹 React에서 받은 파일명을 사용하도록 수정
+    if (window.fileName) {
+        document.title = `Now Playing: ${window.fileName}`;
+    } else {
+        document.title = "Now Playing: Unknown File"; // 예외 처리
+    }
+
+
     const audioLoader = new THREE.AudioLoader();
 
     audioLoader.load(blobUrl, function (buffer) {
