@@ -92,6 +92,8 @@ h2 {
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+  font-variant-ligatures: none; 
+  text-rendering: optimizeLegibility;
 }
 
 .feature-details h3 {
@@ -124,4 +126,12 @@ h2 {
 
 .feature-details::after {
   display: none;
+}
+
+.feature-details p {
+  white-space: pre-line; 
+}
+
+.feature-card p {
+  white-space: pre-line;
 }

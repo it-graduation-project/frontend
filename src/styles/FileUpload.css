@@ -61,3 +61,58 @@
   font-size: 12px;
   color: #6c6c6c;
 }
+
+/* ✅ 체크 아이콘 원형 배경 (연한 보라색 추가) */
+.check-icon-container {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(147, 51, 234, 0.1); /* 연한 보라색 배경 */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 10px;
+}
+
+/* ✅ 체크 아이콘 크기 */
+.check-icon {
+  width: 24px;  /* 적당한 크기로 조정 */
+  height: 24px;
+  animation: bounceIn 0.6s ease-out;
+}
+
+/* ✅ 'Upload New File' 버튼 그라데이션 스타일 */
+.upload-new-btn {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 9999px;  /* 더 둥글게 */
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: bold;
+  background: linear-gradient(135deg, #9333EA 10%, #7A5CEA 40%, #4285F4 90%);
+  color: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.upload-new-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+}
+
+/* ✅ 애니메이션 */
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+

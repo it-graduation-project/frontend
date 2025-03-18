@@ -24,11 +24,13 @@ const features = [
   {
     id: "tactilization",
     title: "Music Tactilization",
-    shortDescription: "Feel music through haptic vibrations and tactile feedback",
-    detailsDescription: "Experience music in a completely new way through advanced haptic feedback technology. Our device translates different musical elements into distinct tactile sensations:",
+    shortDescription: `Feel music through haptic vibrations 
+    and tactile feedback`,
+    detailsDescription: `Feel music beyond sound. Our haptic system converts musical elements into distinct tactile sensations, 
+    ensuring an immersive multi-sensory experience for everyone, including the hearing-impaired.`,
     details: [
-      { icon: "🎛️", text: "Bass frequencies as deep vibrations" },
-      { icon: "🎵", text: "Melody as rhythmic patterns" },
+      { icon: "🎛️", text: "Deep Bass as Powerful Vibrations" },
+      { icon: "🎵", text: "Melody Translated into Rhythmic Pulses" },
       { icon: "🌊", text: "Dynamic range as intensity variation" },
     ],
     icon: vibrateIconImage,
@@ -36,24 +38,27 @@ const features = [
   {
     id: "visualization",
     title: "Music Visualization",
-    shortDescription: "See music through dynamic real-time visual effects",
-    detailsDescription: "See music through dynamic real-time visual effects that respond to different frequencies and beats, creating an immersive audiovisual experience.",
+    shortDescription: `See music through dynamic 
+    real-time visual effects`,
+    detailsDescription: `See the music, not just hear it. Our real-time visual effects transform audio into a dynamic visual landscape, making sound tangible through interactive graphics and animations.`,
     details: [
-      { icon: "🌊", text: "Waveform animations" },
-      { icon: "💡", text: "Color shifts based on tone" },
-      { icon: "⚡", text: "Beat-synchronized effects" },
+      { icon: "🎨", text: "Dynamic Shape & Motion Animations" },
+      { icon: "💡", text: "Customizable Color Effects" },
+      { icon: "⚡", text: "Beat-Synced Visual Effects" },
     ],
     icon: visualizeIconImage, 
   },
   {
     id: "gesture",
     title: "Gesture Control",
-    shortDescription: "Control and interact with music using intuitive hand gestures",
-    detailsDescription: "Control and interact with music using intuitive hand gestures. Adjust playback, volume, and effects simply by moving your hands.",
+    shortDescription: `Control and interact with music 
+    using intuitive hand gestures`,
+    detailsDescription: `Hands-on control for a smooth experience. Clench your fist to stop, open your palm to play. 
+    Watch your movements in real time for a fully interactive experience.`,
     details: [
-      { icon: "✋", text: "Pause & Play with hand motion" },
-      { icon: "🔊", text: "Volume control with swipe" },
-      { icon: "🎛️", text: "Effect modulation via gestures" },
+      { icon: "✋", text: "Seamless Hand-Gesture Interaction" },
+      { icon: "🎧", text: "Play & Pause with a Simple Hand Motion" },
+      { icon: "📸", text: "Effect modulation via gestures" },
     ],
     icon: gestureIconImage, 
   },

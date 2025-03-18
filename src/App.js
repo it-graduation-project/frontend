@@ -34,6 +34,7 @@ function App() {
   const [token, setToken] = useState(null); // JWT 토큰 상태
   const [audioUrl, setAudioUrl] = useState(null); // 업로드된 음악 URL 상태
   const [popupData, setPopupData] = useState({ isOpen: false });
+  const [fileName, setFileName] = useState(null); // 추가
   const [isBluetoothConnected, setIsBluetoothConnected] = useState(false); // ✅ Bluetooth Classic 연결 상태
 
   // 애플리케이션 시작 시 로컬스토리지에서 JWT 토큰 확인
@@ -121,10 +122,14 @@ function App() {
       />
 
       {/* 파일 업로드 섹션 */}
-      <FileUpload onFileUpload={(url) => setAudioUrl(url)} />
+      <FileUpload onFileUpload={(url, name) => {
+        setAudioUrl(url);
+        setFileName(name);
+      }} />
 
       {/* 업로드된 음악이 있으면 시각화 실행 */}
-      {audioUrl && <Visualizer audioUrl={audioUrl} />}
+      {audioUrl && fileName && <Visualizer audioUrl={audioUrl} fileName={fileName} />}
+
 
       {/* 주요 기능 섹션 */}
       <KeyFeatures /> 
@@ -132,7 +137,7 @@ function App() {
       {/* 푸터 */}
       <Footer />
 
-      {/* ✅ 공통 ActionPopup 사용 (파일 교체 / 로그아웃) */}
+      {/* 공통 ActionPopup 사용 (파일 교체 / 로그아웃) */}
       <ActionPopup {...popupData} />
     </div>
   );
