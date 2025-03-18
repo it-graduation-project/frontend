@@ -3,45 +3,65 @@
   - 웹사이트의 하단 정보 및 링크 섹션 스타일
 */
 
+/* Footer.css - 푸터 스타일 개선 */
 .footer {
-  background-color: #ffffff;
-  padding: 40px 20px;
-  text-align: left;
+  background-color: #f8f9fa;
+  padding: 60px 20px; /* 🔥 전체적인 여백 증가 */
+  text-align: center;
+  border-top: none; /* Key Features와 구분선 제거 */
 }
 
-.footer-links {
-  display: flex;
-  justify-content: space-between;
-  max-width: 1200px;
+.footer-content {
+  max-width: 800px;
   margin: 0 auto;
 }
 
-.footer-column {
-  flex: 1;
+.footer-content h3 {
+  font-size: 22px; /* 조금 더 크고 시각적으로 명확하게 */
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px; /* 🔥 아래 여백 증가 */
 }
 
-.footer-column h3 {
+.footer-content p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 40px; /* 🔥 설명 텍스트와 링크 사이 여백 증가 */
+}
+
+/* 🔥 GitHub과 이메일을 한 줄에 정렬하면서도 간격을 유지 */
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px; /* 🔥 GitHub과 이메일 요소 사이 간격 증가 */
+  flex-wrap: wrap; /* 🔥 화면이 작아질 경우 자동 줄바꿈 */
+}
+
+.footer-links a {
+  display: flex;
+  align-items: center;
   font-size: 16px;
-  margin-bottom: 10px;
-  color: #999;
+  color: #B799FF; /* 연보라색 */
+  text-decoration: none;
+  font-weight: 600;
 }
 
-.footer-column ul {
-  list-style: none;
-  padding: 0;
+.footer-links a:hover {
+  text-decoration: underline;
 }
 
-.footer-column ul li {
-  font-size: 14px;
-  color: #6c6c6c;
-  margin-bottom: 8px;
+.footer-icon {
+  margin-right: 8px;
+  font-size: 18px;
+  color: #B799FF; /* 아이콘 색상도 연보라 */
 }
 
+/* 🔥 푸터 하단 텍스트 위에 얇은 선 추가 */
 .footer-bottom {
-  text-align: center;
-  margin-top: 20px;
+  margin-top: 50px; /* 🔥 푸터 하단과 본문 사이 간격 증가 */
+  padding-top: 20px; /* 🔥 위쪽 패딩 추가 */
   font-size: 14px;
-  color: #999;
-  border-top: 1px solid #ddd;
-  padding-top: 20px;
+  color: #777;
+  border-top: 1px solid #ddd; /* 🔥 얇은 회색 선 추가 */
 }
