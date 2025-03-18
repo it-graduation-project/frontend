@@ -15,8 +15,8 @@ const Hero = () => {
     <section className="hero-section">
       <div className="hero-content">
         <h1>
-          Experience Music through <br /> 
-          <span className="highlight-text">Vision and Touch</span> 
+          Feel the Music through <br /> 
+          <span className="highlight-text">Eyes and Hands</span> 
         </h1>
         <p>
           RhyFeel is an innovative music experience platform that 

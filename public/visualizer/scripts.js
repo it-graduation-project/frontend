@@ -5,7 +5,7 @@
   - Three.js를 사용하여 3D 객체와 후처리 효과 적용
   - Web Audio API와 연동하여 음악 분석 및 시각적 반응 구현
   - 사용자 인터랙션 (재생/정지 버튼, 마우스 입력, GUI 조절) 지원
-  - FFT 데이터를 React로 전달하여 Bluetooth Classic을 통해 ESP32에 전송
+  - FFT 데이터를 React로 전달하여 ESP32에 USB(시리얼) 기반으로 전송
 */
 
 console.log("✅ scripts.js 실행됨!");
@@ -28,8 +28,8 @@ function sendFFTDataToReact(value) {
 function detectBeat() {
     if (!analyser) return;
 
-    let frequencyValue = analyser.getAverageFrequency(); // ✅ 원본 FFT 값 유지
-    sendFFTDataToReact(frequencyValue); // ✅ 변형 없이 그대로 React로 전송
+    let frequencyValue = analyser.getAverageFrequency(); // 원본 FFT 값 유지
+    sendFFTDataToReact(frequencyValue); // 변형 없이 그대로 React로 전송
 }
 
 let fftInterval = null;
@@ -39,7 +39,7 @@ function startFFTStreaming() {
 
     console.log("🎵 FFT 데이터 스트리밍 시작!");
     fftInterval = setInterval(() => {
-        if (isPlaying) detectBeat(); // ✅ 음악이 재생 중일 때만 FFT 데이터 전송
+        if (isPlaying) detectBeat(); // 음악이 재생 중일 때만 FFT 데이터 전송
     }, 10); // 조절요소
 }
 
@@ -160,7 +160,7 @@ document.body.appendChild(gestureControlButton);
 
 let webcamWindow = null; // 웹캠 창 저장
 
-// 🟣 Gesture Control 버튼 클릭 시 웹캠 새 창 실행 or 종료
+// Gesture Control 버튼 클릭 시 웹캠 새 창 실행 or 종료
 gestureControlButton.addEventListener("click", () => {
     if (webcamWindow && !webcamWindow.closed) {
         // 웹캠 창이 열려 있다면 종료
@@ -190,7 +190,7 @@ gestureControlButton.addEventListener("click", () => {
     }
 });
 
-// 🛑 시각화 창 닫힐 때 웹캠 창 자동 닫기
+// 시각화 창 닫힐 때 웹캠 창 자동 닫기
 window.addEventListener("beforeunload", () => {
     if (webcamWindow && !webcamWindow.closed) {
         console.log("🚪 부모 창 닫힘 → 웹캠 창 자동 종료");
@@ -300,7 +300,7 @@ function playMusic() {
     isPlaying = true;
     animate();
 
-    startFFTStreaming(); // ✅ 음악 재생 시 FFT 데이터 전송 시작
+    startFFTStreaming(); // 음악 재생 시 FFT 데이터 전송 시작
 
     // React에 재생 상태 전달
     window.opener?.postMessage({ type: "musicStatus", status: "playing" }, "*");
@@ -318,7 +318,7 @@ function pauseMusic() {
     sound.stop();
     isPlaying = false;
 
-    stopFFTStreaming(); // ✅ 음악 정지 시 FFT 데이터 전송 중단
+    stopFFTStreaming(); // 음악 정지 시 FFT 데이터 전송 중단
 
     // React에 정지 상태 전달
     window.opener?.postMessage({ type: "musicStatus", status: "paused" }, "*");
@@ -375,14 +375,14 @@ initialRender();
 // 애니메이션 루프 (재생 중일 때만 실행)
 const clock = new THREE.Clock();
 let animateFrameId;
-// let lastFrameTime = performance.now(); // 🔥 마지막 프레임 시간 저장
+// let lastFrameTime = performance.now(); // 마지막 프레임 시간 저장
 
 function animate() {
     if (!isPlaying) return;
     animateFrameId = requestAnimationFrame(animate);
 
     // let now = performance.now();
-    // let frameTime = now - lastFrameTime; // 🔥 프레임 간격(ms) 계산
+    // let frameTime = now - lastFrameTime; // 프레임 간격(ms) 계산
     // lastFrameTime = now;
 
     // console.log(`🎨 시각화 애니메이션 업데이트 간격: ${frameTime.toFixed(2)}ms`);
@@ -465,9 +465,9 @@ window.addEventListener('unload', () => {
     }
 }); 
 
-// React에서 블루투스 상태를 받을 수 있도록 설정
+// React에서 ESP32 연결 상태를 받을 수 있도록 설정 (Web Serial API)
 window.addEventListener("message", (event) => {
-    if (event.data.type === "bluetoothStatus") {
-        console.log(`💡 Bluetooth Status: ${event.data.status}`);
+    if (event.data.type === "serialStatus") {
+        console.log(`💡 Serial Connection Status: ${event.data.status}`);
     }
 });

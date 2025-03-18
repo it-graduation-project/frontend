@@ -76,7 +76,7 @@ const FileUpload = ({ onFileUpload }) => {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     };
-  }, [visualizerWindows.length]); // ✅ `visualizerWindows.length`가 바뀔 때마다 감지
+  }, [visualizerWindows.length]); // `visualizerWindows.length`가 바뀔 때마다 감지
   
   
   // 로그인 여부 확인 후 파일 선택기 활성화
