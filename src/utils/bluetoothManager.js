@@ -40,16 +40,14 @@ export const connectBluetoothClassic = async () => {
     }
 
     // ✅ Serial 포트 열기 (Baudrate 설정)
-    await serialPort.open({ baudRate: 115200 });
+    await serialPort.open({ baudRate: 230400 });
 
     serialWriter = serialPort.writable.getWriter(); // ✅ 데이터 전송을 위한 writer 생성
     isConnected = true;
 
-    console.log("✅ Connected to Bluetooth Classic device!");
-    notifyVisualizer("connected");
+    console.log("✅ Web Serial 연결 성공!");
 
-    // ✅ 연결 감지 (연결이 끊어지면 handleDisconnect() 호출)
-    readLoop();
+    notifyVisualizer("connected");
 
     return true;
   } catch (error) {
@@ -79,40 +77,6 @@ export const disconnectBluetoothClassic = async () => {
   console.log("🔴 Bluetooth Classic 연결 해제됨");
 };
 
-// ✅ Bluetooth Classic 연결 감지 핸들러 (연결 끊김 감지)
-async function handleDisconnect() {
-  console.warn("⚠️ Bluetooth Classic connection lost!");
-  isConnected = false;
-  notifyVisualizer("disconnected");
-
-  try {
-    if (serialPort) {
-      await serialPort.close();
-      serialPort = null;
-    }
-  } catch (error) {
-    console.error("❌ Serial Port close error:", error);
-  }
-}
-
-// ✅ Bluetooth Classic 연결 감지 루프 (끊어지면 자동으로 handleDisconnect() 호출)
-async function readLoop() {
-  try {
-    const reader = serialPort.readable.getReader();
-    while (true) {
-      const { done } = await reader.read();
-      if (done) {
-        console.warn("⚠️ Serial connection lost!");
-        handleDisconnect();
-        break;
-      }
-    }
-  } catch (error) {
-    console.error("❌ Error in readLoop:", error);
-    handleDisconnect();
-  }
-}
-
 // ✅ FFT 데이터를 ESP32로 전송하는 함수 (BLE → Serial Write 변경)
 let previousFFTValue = 0; // 🔥 이전 FFT 값을 저장하는 전역 변수 추가
 
@@ -131,14 +95,14 @@ export const sendFFTDataToESP32 = async (value) => {
 
       // ✅ 비트가 강해질 때 (⬆ 상승, diff > 0) → 진동을 더 극대화
       if (diff > 0) {  
-          pulsedValue = Math.min(255, Math.floor(value * 2.3)); // 최대값 255 제한
+          pulsedValue = Math.min(255, Math.floor(value * 2.4)); // 최대값 255 제한
       }
       // ✅ 비트가 약해질 때 (⬇ 하강, diff < 0) → 진동을 극적으로 낮춤
       else { 
-          pulsedValue = Math.max(5, Math.floor(value * 0.5)); // 최소값 5 제한
+          pulsedValue = Math.max(5, Math.floor(value * 0.3)); // 최소값 5 제한
       }
 
-      let data = new Uint8Array([pulsedValue]);
+      let data = new Uint8Array([pulsedValue]);  // ✅ 단일 값만 전송
       await serialWriter.write(data); // ✅ Bluetooth Classic Serial Write 사용
       console.log(`value: ${value} / pulsedValue: ${pulsedValue}, 변화량: ${diff}`);
 
