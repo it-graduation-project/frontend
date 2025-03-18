@@ -3,11 +3,12 @@
   - 웹사이트의 하단 정보 및 링크 섹션 스타일
 */
 
-/* Footer.css - 푸터 스타일 개선 */
+
 .footer {
-  padding: 60px 20px; /* 🔥 전체적인 여백 증가 */
+  background-color: #f8f9fa;
+  padding: 60px 20px; 
   text-align: center;
-  border-top: none; /* Key Features와 구분선 제거 */
+  border-top: none; 
 }
 
 .footer-content {
@@ -16,32 +17,32 @@
 }
 
 .footer-content h3 {
-  font-size: 22px; /* 조금 더 크고 시각적으로 명확하게 */
+  font-size: 22px; 
   font-weight: bold;
   color: #333;
-  margin-bottom: 20px; /* 🔥 아래 여백 증가 */
+  margin-bottom: 20px; 
 }
 
 .footer-content p {
   font-size: 14px;
   color: #555;
-  margin-bottom: 40px; /* 🔥 설명 텍스트와 링크 사이 여백 증가 */
+  margin-bottom: 40px; 
 }
 
-/* 🔥 GitHub과 이메일을 한 줄에 정렬하면서도 간격을 유지 */
+
 .footer-links {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30px; /* 🔥 GitHub과 이메일 요소 사이 간격 증가 */
-  flex-wrap: wrap; /* 🔥 화면이 작아질 경우 자동 줄바꿈 */
+  gap: 30px; 
+  flex-wrap: wrap; 
 }
 
 .footer-links a {
   display: flex;
   align-items: center;
   font-size: 16px;
-  color: #B799FF; /* 연보라색 */
+  color: #7D4DE1; 
   text-decoration: none;
   font-weight: 600;
 }
@@ -53,14 +54,14 @@
 .footer-icon {
   margin-right: 8px;
   font-size: 18px;
-  color: #B799FF; /* 아이콘 색상도 연보라 */
+  color: #7D4DE1; 
 }
 
-/* 🔥 푸터 하단 텍스트 위에 얇은 선 추가 */
+
 .footer-bottom {
-  margin-top: 50px; /* 🔥 푸터 하단과 본문 사이 간격 증가 */
-  padding-top: 20px; /* 🔥 위쪽 패딩 추가 */
+  margin-top: 50px; 
+  padding-top: 20px; 
   font-size: 14px;
   color: #777;
-  border-top: 1px solid #ddd; /* 🔥 얇은 회색 선 추가 */
+  border-top: 1px solid #ddd; 
 }

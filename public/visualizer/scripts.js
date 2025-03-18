@@ -19,6 +19,19 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
 
+const playIconSrc = "/visualizer/images/play_icon.png";
+const pauseIconSrc = "/visualizer/images/pause_icon.png";
+const replayIconSrc = "/visualizer/images/replay_icon.png";
+const gestureCameraIconSrc = `${window.location.origin}/visualizer/images/gesture_camera.png`;
+
+// Controls 패널 삭제 문제 해결
+setTimeout(() => {
+    const controlsContainer = document.querySelector(".dg.main");
+    if (controlsContainer) {
+        controlsContainer.remove();
+    }
+}, 500);
+
 // FFT 데이터를 React로 전송하는 함수
 function sendFFTDataToReact(value) {
     window.opener?.postMessage({ type: "fftData", value }, "*");
@@ -127,66 +140,126 @@ let currentPlaybackTime = 0;
 let isPlaying = false;
 let audioContextStartTime = 0; // 추가
 
-// 로딩/재생/정지 버튼 생성 및 스타일 설정
-const playPauseButton = document.createElement("button");
-playPauseButton.textContent = "Loading";
-playPauseButton.style.position = "absolute";
-playPauseButton.style.top = "30px";  
-playPauseButton.style.left = "30px"; 
-playPauseButton.style.transform = "none"; 
-playPauseButton.style.padding = "20px 40px";
-playPauseButton.style.fontSize = "24px";
-playPauseButton.style.fontWeight = "bold";
-playPauseButton.style.backgroundColor = "gray"; // 로딩 중일 때 비활성화
-playPauseButton.style.color = "white";
-playPauseButton.style.border = "none";
-playPauseButton.style.cursor = "not-allowed";
-document.body.appendChild(playPauseButton);
+// Gesture Control 토글 버튼 생성
+const gestureControlContainer = document.createElement("div");
+gestureControlContainer.style.position = "absolute";
+gestureControlContainer.style.top = "20px";
+gestureControlContainer.style.right = "20px";
+gestureControlContainer.style.display = "flex";
+gestureControlContainer.style.alignItems = "center";
+gestureControlContainer.style.gap = "10px";
+gestureControlContainer.style.fontFamily = "Arial, Helvetica, sans-serif";
+gestureControlContainer.style.padding = "8px 15px";
+gestureControlContainer.style.borderRadius = "12px";  // 둥근 사각형 형태로 변경
+gestureControlContainer.style.border = "1px solid rgba(255, 255, 255, 0.5)";  // 흰색 테두리 추가
+gestureControlContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)";  // 반투명 배경 추가
 
-// Gesture Control ON/OFF 버튼 생성 (초기 상태: ON)
-const gestureControlButton = document.createElement("button");
-gestureControlButton.textContent = "Gesture Control ON";  // 기본 상태
-gestureControlButton.style.position = "absolute";
-gestureControlButton.style.top = "30px";
-gestureControlButton.style.left = "200px";
-gestureControlButton.style.padding = "20px 40px";
-gestureControlButton.style.fontSize = "24px";
-gestureControlButton.style.fontWeight = "bold";
-gestureControlButton.style.backgroundColor = "purple";  // ON 상태일 때 보라색
-gestureControlButton.style.color = "white";
-gestureControlButton.style.border = "none";
-gestureControlButton.style.cursor = "pointer";
-document.body.appendChild(gestureControlButton);
+const gestureLabel = document.createElement("span");
+gestureLabel.textContent = "Gesture Control ";
+gestureLabel.style.color = "white";
+gestureLabel.style.fontSize = "18px";
+gestureLabel.style.fontWeight = "600";
+
+const gestureCameraIcon = document.createElement("img");
+gestureCameraIcon.src = gestureCameraIconSrc;
+gestureCameraIcon.style.width = "28px";
+gestureCameraIcon.style.height = "28px";
+
+// 토글 버튼 생성
+const gestureToggleWrapper = document.createElement("label");
+gestureToggleWrapper.style.display = "inline-flex";
+gestureToggleWrapper.style.alignItems = "center";
+gestureToggleWrapper.style.cursor = "pointer";
+
+const gestureToggle = document.createElement("input");
+gestureToggle.type = "checkbox";
+gestureToggle.style.display = "none";
+
+const gestureToggleTrack = document.createElement("div");
+gestureToggleTrack.style.width = "50px";
+gestureToggleTrack.style.height = "25px";
+gestureToggleTrack.style.backgroundColor = "#555";
+gestureToggleTrack.style.borderRadius = "50px";
+gestureToggleTrack.style.position = "relative";
+gestureToggleTrack.style.transition = "background 0.3s";
+
+const gestureCircle = document.createElement("div");
+gestureCircle.style.width = "20px";
+gestureCircle.style.height = "20px";
+gestureCircle.style.backgroundColor = "white";
+gestureCircle.style.borderRadius = "50%";
+gestureCircle.style.position = "absolute";
+gestureCircle.style.top = "50%";
+gestureCircle.style.left = "5px";
+gestureCircle.style.transform = "translateY(-50%)";
+gestureCircle.style.transition = "left 0.3s";
+
+gestureToggleWrapper.appendChild(gestureToggle);
+gestureToggleTrack.appendChild(gestureCircle);
+gestureToggleWrapper.appendChild(gestureToggleTrack);
+gestureControlContainer.appendChild(gestureLabel);
+gestureControlContainer.appendChild(gestureCameraIcon);
+gestureControlContainer.appendChild(gestureToggleWrapper);
+document.body.appendChild(gestureControlContainer);
 
 let webcamWindow = null; // 웹캠 창 저장
+let webcamCheckInterval = null; // 웹캠 상태 감지 setInterval 변수
 
-// Gesture Control 버튼 클릭 시 웹캠 새 창 실행 or 종료
-gestureControlButton.addEventListener("click", () => {
-    if (webcamWindow && !webcamWindow.closed) {
-        // 웹캠 창이 열려 있다면 종료
-        webcamWindow.close();
-        webcamWindow = null;
-        gestureControlButton.textContent = "Gesture Control ON";
-        gestureControlButton.style.backgroundColor = "purple";
-        console.log("🛑 Gesture Control 종료");
+// 🟣 Gesture Control 토글 버튼을 사용하여 웹캠 ON/OFF 제어
+gestureToggle.addEventListener("change", () => {
+    if (gestureToggle.checked) {
+        // 🟢 제스처 컨트롤 활성화 → 웹캠 창 열기
+        gestureToggleTrack.style.backgroundColor = "#B799FF"; // 활성화 시 연보라색
+        gestureCircle.style.left = "25px";
+        console.log("✅ Gesture Control 활성화");
 
-        // 웹캠 종료됨 메시지 React로 전송 
-        window.opener?.postMessage({ type: "webcamClosed" }, "*");
-    } else {
-        // 웹캠 창 새로 열기
+        // 웹캠 창 열기
         webcamWindow = window.open("/visualizer/webcam.html", "_blank", "width=400,height=300");
 
         if (webcamWindow) {
-            gestureControlButton.textContent = "Gesture Control OFF";
-            gestureControlButton.style.backgroundColor = "gray";
-            console.log("✅ Gesture Control 실행");
-
-            // 웹캠 열림 메시지 React로 전송 
             window.opener?.postMessage({ type: "webcamOpened" }, "*");
+            
+            // 새로운 웹캠 감지 setInterval 시작
+            if (webcamCheckInterval) clearInterval(webcamCheckInterval); // 기존 interval 제거
+            webcamCheckInterval = setInterval(() => {
+                if (webcamWindow && webcamWindow.closed) {
+                    console.log("🚪 웹캠 창이 닫혔습니다. Gesture Control OFF로 변경!");
+                    gestureToggle.checked = false;
+                    gestureToggleTrack.style.backgroundColor = "#555"; // 회색 OFF 상태
+                    gestureCircle.style.left = "5px";
+                    webcamWindow = null; // 웹캠 창 객체 초기화
+                    clearInterval(webcamCheckInterval); // 더 이상 감지할 필요 없음
+
+                    // React 또는 부모 창으로 메시지 전송 
+                    window.opener?.postMessage({ type: "webcamClosed" }, "*");
+                }
+            }, 1000);
         } else {
             console.error("❌ 팝업 차단으로 인해 새 창을 열 수 없습니다.");
             alert("🚨 팝업 차단을 허용해주세요!");
+            // 팝업이 차단된 경우 토글을 원래대로 되돌림
+            gestureToggle.checked = false;
+            gestureToggleTrack.style.backgroundColor = "#555";
+            gestureCircle.style.left = "5px";
         }
+    } else {
+        // 🔴 제스처 컨트롤 비활성화 → 웹캠 창 닫기
+        gestureToggleTrack.style.backgroundColor = "#555"; // 비활성화 시 회색
+        gestureCircle.style.left = "5px";
+        console.log("🛑 Gesture Control 비활성화");
+
+        if (webcamWindow && !webcamWindow.closed) {
+            webcamWindow.close();
+            webcamWindow = null;
+        }
+
+         // 기존 감지 interval 제거
+         if (webcamCheckInterval) {
+            clearInterval(webcamCheckInterval);
+            webcamCheckInterval = null;
+        }
+
+        window.opener?.postMessage({ type: "webcamClosed" }, "*");
     }
 });
 
@@ -197,8 +270,99 @@ window.addEventListener("beforeunload", () => {
         webcamWindow.close();
         webcamWindow = null;
     }
+
+    // 닫히지 않는 경우를 대비해 500ms 후에도 한 번 더 확인
+    setTimeout(() => {
+        if (webcamWindow && !webcamWindow.closed) {
+            console.log("⏳ 웹캠 창이 닫히지 않아 다시 시도!");
+            webcamWindow.close();
+            webcamWindow = null;
+        }
+    }, 500);
 });
 
+// Play/Pause 버튼 생성
+const playPauseButton = document.createElement("div");
+playPauseButton.style.position = "absolute";
+playPauseButton.style.top = "20px";
+playPauseButton.style.left = "20px";
+playPauseButton.style.width = "45px";
+playPauseButton.style.height = "45px";
+playPauseButton.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+playPauseButton.style.border = "2px solid rgba(255, 255, 255, 0.2)";
+playPauseButton.style.borderRadius = "50%";
+playPauseButton.style.display = "flex";
+playPauseButton.style.alignItems = "center";
+playPauseButton.style.justifyContent = "center";
+playPauseButton.style.cursor = "pointer";
+
+const playPauseIcon = document.createElement("img");
+playPauseIcon.src = playIconSrc;
+playPauseIcon.style.width = "20px";
+playPauseIcon.style.height = "20px";
+
+playPauseButton.appendChild(playPauseIcon);
+document.body.appendChild(playPauseButton);
+
+// 음악 재생
+function playMusic() {
+    // 🔄 Replay 버튼 클릭 시 처음부터 재생
+    if (playPauseIcon.src === window.location.origin + replayIconSrc) {
+        console.log("🔄 Replay 버튼 클릭됨 → 음악 처음부터 재생");
+        sound.stop();
+        currentPlaybackTime = 0;
+    }
+
+    if (sound.isPlaying) return;
+    console.log("▶ 음악 재생");
+    sound.offset = currentPlaybackTime;
+    sound.play();
+    audioContextStartTime = sound.context.currentTime - currentPlaybackTime;
+    isPlaying = true;
+    animate();
+
+    startFFTStreaming(); // FFT 데이터 전송 시작
+
+    // 버튼을 Pause 아이콘으로 변경
+    playPauseIcon.src = pauseIconSrc;
+
+    // React에 재생 상태 전달
+    window.opener?.postMessage({ type: "musicStatus", status: "playing" }, "*");
+}
+
+// 음악 정지
+function pauseMusic() {
+    if (!sound.isPlaying) return;
+    console.log("⏸ 음악 정지");
+    currentPlaybackTime = sound.context.currentTime - audioContextStartTime;
+    sound.stop();
+    isPlaying = false;
+
+    stopFFTStreaming(); // ✅ FFT 데이터 전송 중단
+
+    // 🎨 버튼을 Play 아이콘으로 변경
+    playPauseIcon.src = playIconSrc;
+
+    // React에 정지 상태 전달
+    window.opener?.postMessage({ type: "musicStatus", status: "paused" }, "*");
+}
+
+// Play/Pause 버튼 이벤트
+playPauseButton.addEventListener("click", () => {
+    isPlaying ? pauseMusic() : playMusic();
+});
+
+
+// 음악 종료 시 Replay 버튼으로 변경 (재생 중에는 실행 안 됨)
+sound.onEnded = function () {
+    if (!isPlaying) return; // 종료 이벤트 중복 방지
+
+    console.log("🎵 음악이 끝났습니다. Replay 버튼으로 변경");
+
+    playPauseIcon.src = replayIconSrc;
+    isPlaying = false;
+    currentPlaybackTime = 0; // 재생 위치 초기화
+};
 
 // JWT 토큰을 포함하여 서버에서 오디오 파일 가져오기
 const fetchAudioWithJWT = async (url) => {
@@ -270,82 +434,19 @@ window.onload = async function () {
         console.log("🎛 AudioAnalyser 생성 완료!");
 
         // 버튼 활성화
-        playPauseButton.textContent = "Play";
-        playPauseButton.style.backgroundColor = "#28a745";
-        playPauseButton.style.cursor = "pointer";
+        playPauseButton.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+        playPauseButton.style.borderRadius = "50%";
+        playPauseButton.style.display = "flex";
+        playPauseButton.style.alignItems = "center";
+        playPauseButton.style.justifyContent = "center";
+
+        // 기존 아이콘을 유지하면서 play 아이콘만 보이게 변경
+        playPauseIcon.src = playIconSrc;
 
         let audioContextStartTime = 0; // 오디오 재생 시작 시간
 
         });
 };
-
-// 음악 재생
-function playMusic() {
-    if (playPauseButton.textContent === "Replay") {
-        console.log("🔄 Replay 버튼 클릭됨 → 음악 처음부터 재생");
-        sound.stop();
-        currentPlaybackTime = 0;
-
-        // 🎨 Replay 버튼 스타일 초기화 (Play 버튼처럼 변경)
-        playPauseButton.textContent = "Stop";
-        playPauseButton.style.backgroundColor = "#dc3545"; 
-        playPauseButton.style.color = "white";
-    }
-
-    if (sound.isPlaying) return;
-    console.log("▶ 음악 재생");
-    sound.offset = currentPlaybackTime;
-    sound.play();
-    audioContextStartTime = sound.context.currentTime - currentPlaybackTime;
-    isPlaying = true;
-    animate();
-
-    startFFTStreaming(); // 음악 재생 시 FFT 데이터 전송 시작
-
-    // React에 재생 상태 전달
-    window.opener?.postMessage({ type: "musicStatus", status: "playing" }, "*");
-
-    playPauseButton.textContent = "Stop";
-    playPauseButton.style.backgroundColor = "#dc3545";
-    playPauseButton.style.color = "white";
-}
-
-// 음악 정지
-function pauseMusic() {
-    if (!sound.isPlaying) return;
-    console.log("⏸ 음악 정지");
-    currentPlaybackTime = sound.context.currentTime - audioContextStartTime;
-    sound.stop();
-    isPlaying = false;
-
-    stopFFTStreaming(); // 음악 정지 시 FFT 데이터 전송 중단
-
-    // React에 정지 상태 전달
-    window.opener?.postMessage({ type: "musicStatus", status: "paused" }, "*");
-
-    playPauseButton.textContent = "Play";
-    playPauseButton.style.backgroundColor = "#28a745";
-    playPauseButton.style.color = "white";
-}
-
-// Play/Pause 버튼 이벤트
-playPauseButton.addEventListener("click", () => isPlaying ? pauseMusic() : playMusic());
-
-// 음악 종료 시 Replay 버튼으로 변경 (재생 중에는 실행 안 됨)
-sound.onEnded = function () {
-    if (!isPlaying) return; // 종료 이벤트 중복 방지
-
-    console.log("🎵 음악이 끝났습니다. Replay 버튼으로 변경");
-
-    playPauseButton.textContent = "Replay";
-    playPauseButton.style.backgroundColor = "#60A5FA"; 
-    playPauseButton.style.color = "white";
-    playPauseButton.style.cursor = "pointer";
-
-    isPlaying = false;
-    currentPlaybackTime = 0; // 재생 위치 초기화
-};
-
 
 // 제스처 이벤트 감지 (웹캠 창에서 신호 수신)
 window.addEventListener("message", (event) => {
@@ -355,16 +456,6 @@ window.addEventListener("message", (event) => {
         if (event.data.gesture === "pause") pauseMusic();
     }
 });
-
-// 웹캠 창이 닫히면 자동 정리
-setInterval(() => {
-    if (webcamWindow && webcamWindow.closed) {
-        webcamWindow = null;
-        gestureControlButton.textContent = "Gesture Control ON";
-        gestureControlButton.style.backgroundColor = "purple";
-    }
-}, 1000);
-
 
 // 초기 장면을 렌더링 (흰 화면 방지)
 function initialRender() {
