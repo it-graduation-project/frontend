@@ -263,7 +263,7 @@ gestureToggle.addEventListener("change", () => {
     }
 });
 
-// 시각화 창 닫힐 때 웹캠 창 자동 닫기
+// 시각화 창 닫힐 때 웹캠 창 자동 닫기 & 진동 즉시 정지
 window.addEventListener("beforeunload", () => {
     if (webcamWindow && !webcamWindow.closed) {
         console.log("🚪 부모 창 닫힘 → 웹캠 창 자동 종료");
@@ -279,6 +279,14 @@ window.addEventListener("beforeunload", () => {
             webcamWindow = null;
         }
     }, 500);
+
+    console.log("🚪 시각화 창 닫힘 → React에 진동 정지 요청 (beforeunload)");
+    window.opener?.postMessage({ type: "stopVibration" }, "*"); // React로 메시지 전송
+});
+
+window.addEventListener("unload", () => {
+    console.log("🚪 시각화 창 닫힘 → React에 진동 정지 요청 (unload)");
+    window.opener?.postMessage({ type: "stopVibration" }, "*");
 });
 
 // Play/Pause 버튼 생성
@@ -465,18 +473,10 @@ initialRender();
 
 // 애니메이션 루프 (재생 중일 때만 실행)
 const clock = new THREE.Clock();
-let animateFrameId;
-// let lastFrameTime = performance.now(); // 마지막 프레임 시간 저장
 
 function animate() {
     if (!isPlaying) return;
-    animateFrameId = requestAnimationFrame(animate);
-
-    // let now = performance.now();
-    // let frameTime = now - lastFrameTime; // 프레임 간격(ms) 계산
-    // lastFrameTime = now;
-
-    // console.log(`🎨 시각화 애니메이션 업데이트 간격: ${frameTime.toFixed(2)}ms`);
+    requestAnimationFrame(animate);
 
     camera.position.x += (mouseX - camera.position.x) * 0.05;
     camera.position.y += (-mouseY - camera.position.y) * 0.5;

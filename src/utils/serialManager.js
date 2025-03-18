@@ -101,6 +101,14 @@ export const sendFFTDataToESP32 = async (value) => {
   if (!isConnected || !serialWriter) return;
 
   try {
+      // 0이 들어오면 반드시 전송 (진동 완전 OFF 보장)
+      if (value === 0) {
+        let data = new Uint8Array([0]);
+        await serialWriter.write(data);
+        console.log("🔴 강제 진동 정지 (0 전송)");
+        return;
+      }
+
       let diff = value - previousFFTValue; // 변화량 (부호 포함)
       let pulsedValue;
 
@@ -112,11 +120,11 @@ export const sendFFTDataToESP32 = async (value) => {
 
       // 비트가 강해질 때 (⬆ 상승, diff > 0) → 진동을 더 극대화
       if (diff > 0) {  
-          pulsedValue = Math.min(255, Math.floor(value * 2.4)); // 최대값 255 제한
+          pulsedValue = Math.min(255, Math.floor(value * 2.2)); // 최대값 255 제한
       }
       // 비트가 약해질 때 (⬇ 하강, diff < 0) → 진동을 극적으로 낮춤
       else { 
-          pulsedValue = Math.max(5, Math.floor(value * 0.3)); // 최소값 5 제한
+          pulsedValue = Math.max(5, Math.floor(value * 0.5)); // 최소값 5 제한
       }
 
       let data = new Uint8Array([pulsedValue]);  // 단일 값만 전송

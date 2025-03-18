@@ -77,6 +77,7 @@ function App() {
         if (event.data.status === "playing") {
           if (isSerialConnected) startStreamingFFTData(); // 음악이 재생되면 FFT 데이터 전송 시작
         } else if (event.data.status === "paused") {
+          sendFFTDataToESP32(0);
           stopStreamingFFTData(); // 음악이 멈추면 FFT 데이터 전송 중단
         }
       }
@@ -85,6 +86,19 @@ function App() {
     window.addEventListener("message", handleMusicStatus);
     return () => window.removeEventListener("message", handleMusicStatus);
   }, [isSerialConnected]);
+
+  // 시각화 창이 닫힐 때 진동 모터 즉시 정지
+  useEffect(() => {
+    function handleVisualizerClose(event) {
+        if (event.data.type === "stopVibration") {
+            console.log("🚫 시각화 창 닫힘 감지 → 진동 모터 즉시 정지");
+            sendFFTDataToESP32(0); // 💡 무조건 진동 OFF
+            stopStreamingFFTData();
+        }
+    }
+    window.addEventListener("message", handleVisualizerClose);
+    return () => window.removeEventListener("message", handleVisualizerClose);
+  }, []);
 
   return (
     <div className="App">
