@@ -5,7 +5,6 @@
 
 /* Footer.css - 푸터 스타일 개선 */
 .footer {
-  background-color: #f8f9fa;
   padding: 60px 20px; /* 🔥 전체적인 여백 증가 */
   text-align: center;
   border-top: none; /* Key Features와 구분선 제거 */

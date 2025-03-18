@@ -204,7 +204,7 @@ const FileUpload = ({ onFileUpload }) => {
           <img src={checkIconImage} alt="Check Icon" className="check-icon" />
           </div>
           <h3>File Upload Complete!</h3>
-          <p className="uploaded-file-name">🎵 {selectedFile?.name}</p>
+          <p>🎵 {selectedFile?.name}</p>
           <button className="upload-new-btn" onClick={() => setIsPopupOpen(true)}>
             Upload New File
           </button>

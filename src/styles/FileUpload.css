@@ -31,7 +31,7 @@
   transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
-/* 🔹 드래그 오버 효과 */
+/* 드래그 오버 효과 */
 .upload-box.drag-over {
   border-color: #9333EA; 
   background: linear-gradient(180deg, #FFFFFF 0%, #EEF2FF 100%); 
@@ -43,7 +43,7 @@
   width: 35px;
 }
 
-.browse-btn {
+.browse-btn, .upload-new-btn {
   padding: 15px 30px;
   background: linear-gradient(135deg, #9333EA 10%, #7A5CEA 40%, #4285F4 90%);
   color: #ffffff;
@@ -53,7 +53,7 @@
   transition: transform 0.2s, background-color 0.2s;
 }
 
-.browse-btn:hover {
+.browse-btn:hover, .upload-new-btn:hover {
   transform: scale(1.05);
 }
 
@@ -71,7 +71,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto 10px;
+  margin: 0 auto;
 }
 
 /* 체크 아이콘 크기 */
@@ -79,24 +79,6 @@
   width: 24px;  /* 적당한 크기로 조정 */
   height: 24px;
   animation: bounceIn 0.6s ease-out;
-}
-
-/* 'Upload New File' 버튼 그라데이션 스타일 */
-.upload-new-btn {
-  padding: 14px 28px;
-  border: none;
-  border-radius: 9999px;  /* 더 둥글게 */
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: bold;
-  background: linear-gradient(135deg, #9333EA 10%, #7A5CEA 40%, #4285F4 90%);
-  color: white;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.upload-new-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
 }
 
 /* 애니메이션 */

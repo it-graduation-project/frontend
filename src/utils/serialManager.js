@@ -14,8 +14,6 @@ let fftStreamingInterval = null;
 // Web Serial API 기반 시리얼 장치 연결 함수
 export const connectSerialDevice  = async () => {
   try {
-    console.log("🔍 Searching for Web Serial device...");
-
     // HTTPS 환경 체크 (Web Serial API는 HTTPS에서만 동작)
     if (window.isSecureContext === false) {
       console.error("❌ Web Serial requires HTTPS. Please use a secure connection.");
@@ -29,15 +27,33 @@ export const connectSerialDevice  = async () => {
       disconnectSerialDevice();
     }
 
-    // Web Serial 장치 검색 (ESP32 전용 필터 적용 X)
-    console.log("📡 Requesting Web Serial device...");
-    serialPort = await navigator.serial.requestPort(); // 필터 제거
+    console.log("📡 Checking available Serial devices...");
 
-    if (!serialPort) {
-      console.error("❌ No compatible device found!");
-      alert("🚨 No compatible Web Serial device found. Please check your connection.");
+    // 기존에 연결된 장치 목록 가져오기
+    const ports = await navigator.serial.getPorts();
+
+    // 장치가 아예 없으면 경고 띄우고 종료
+    if (ports.length === 0) {
+      console.error("❌ No serial devices found!");
+      alert("🚨 'RhyFeel' 장치를 찾을 수 없습니다! USB 연결을 확인하세요.");
       return false;
     }
+
+    // 특정 장치(COM5 USB Serial) 찾기 (VID: 0x1A86, PID: 0x7523)
+    serialPort = ports.find(port => {
+      const info = port.getInfo();
+      return info.usbVendorId === 0x1A86 && info.usbProductId === 0x7523;
+    });
+
+    // 특정 장치가 없으면 경고 띄우고 종료
+    if (!serialPort) {
+      console.error("❌ No compatible RhyFeel device found!");
+      alert("🚨 'RhyFeel' 장치를 찾을 수 없습니다! USB 연결을 확인하세요.");
+      return false;
+    }
+
+    // UI에서는 "RhyFeel"로 표시
+    alert(`🟢 Connected to RhyFeel`);
 
     // Serial 포트 열기 (Baudrate 설정)
     await serialPort.open({ baudRate: 230400 });
@@ -75,6 +91,7 @@ export const disconnectSerialDevice  = async () => {
   notifyVisualizer("disconnected");
 
   console.log("🔴 Web Serial 연결 해제됨");
+  alert("🔴 Disconnected from RhyFeel");
 };
 
 // FFT 데이터를 ESP32로 전송하는 함수
