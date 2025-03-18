@@ -140,40 +140,6 @@ let currentPlaybackTime = 0;
 let isPlaying = false;
 let audioContextStartTime = 0; // 추가
 
-// 로딩/재생/정지 버튼 생성 및 스타일 설정
-// const playPauseButton = document.createElement("button");
-// playPauseButton.textContent = "Loading";
-// playPauseButton.style.position = "absolute";
-// playPauseButton.style.top = "30px";  
-// playPauseButton.style.left = "30px"; 
-// playPauseButton.style.transform = "none"; 
-// playPauseButton.style.padding = "20px 40px";
-// playPauseButton.style.fontSize = "24px";
-// playPauseButton.style.fontWeight = "bold";
-// playPauseButton.style.backgroundColor = "gray"; // 로딩 중일 때 비활성화
-// playPauseButton.style.color = "white";
-// playPauseButton.style.border = "none";
-// playPauseButton.style.cursor = "not-allowed";
-// document.body.appendChild(playPauseButton);
-
-// Gesture Control ON/OFF 버튼 생성 (초기 상태: ON)
-// const gestureControlButton = document.createElement("button");
-// gestureControlButton.textContent = "Gesture Control ON";  // 기본 상태
-// gestureControlButton.style.position = "absolute";
-// gestureControlButton.style.top = "30px";
-// gestureControlButton.style.left = "200px";
-// gestureControlButton.style.padding = "20px 40px";
-// gestureControlButton.style.fontSize = "24px";
-// gestureControlButton.style.fontWeight = "bold";
-// gestureControlButton.style.backgroundColor = "purple";  // ON 상태일 때 보라색
-// gestureControlButton.style.color = "white";
-// gestureControlButton.style.border = "none";
-// gestureControlButton.style.cursor = "pointer";
-// document.body.appendChild(gestureControlButton);
-
-// 기존 Controls UI 삭제
-
-
 // Gesture Control 토글 버튼 생성
 const gestureControlContainer = document.createElement("div");
 gestureControlContainer.style.position = "absolute";
@@ -264,7 +230,7 @@ gestureToggle.addEventListener("change", () => {
                     webcamWindow = null; // 웹캠 창 객체 초기화
                     clearInterval(webcamCheckInterval); // 더 이상 감지할 필요 없음
 
-                    // 📌 React 또는 부모 창으로 메시지 전송 (삭제 X)
+                    // React 또는 부모 창으로 메시지 전송 
                     window.opener?.postMessage({ type: "webcamClosed" }, "*");
                 }
             }, 1000);
