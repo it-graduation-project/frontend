@@ -53,11 +53,11 @@ const features = [
     title: "Gesture Control",
     shortDescription: `Control and interact with music 
     using intuitive hand gestures`,
-    detailsDescription: `Hands-on control for a smooth experience. Clench your fist to stop, open your palm to play. 
+    detailsDescription: `Hands-on control for a smooth experience. No buttons, no touch—just natural gestures for effortless control.
     Watch your movements in real time for a fully interactive experience.`,
     details: [
-      { icon: "✋", text: "Seamless Hand-Gesture Interaction" },
-      { icon: "🎧", text: "Play & Pause with a Simple Hand Motion" },
+      { icon: "👊", text: "Clench your fist to stop" },
+      { icon: "✋", text: "Open your palm to play" },
       { icon: "📸", text: "Effect modulation via gestures" },
     ],
     icon: gestureIconImage, 
