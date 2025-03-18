@@ -5,7 +5,7 @@
   - Three.js를 사용하여 3D 객체와 후처리 효과 적용
   - Web Audio API와 연동하여 음악 분석 및 시각적 반응 구현
   - 사용자 인터랙션 (재생/정지 버튼, 마우스 입력, GUI 조절) 지원
-  - FFT 데이터를 React로 전달하여 블루투스 제어 가능
+  - FFT 데이터를 React로 전달하여 Bluetooth Classic을 통해 ESP32에 전송
 */
 
 console.log("✅ scripts.js 실행됨!");
@@ -28,25 +28,28 @@ function sendFFTDataToReact(value) {
 function detectBeat() {
     if (!analyser) return;
 
-    let freqData = analyser.getFrequencyData();
-    let sum = 0;
-    let count = 0;
-
-    // 50Hz ~ 200Hz 대역의 평균값 계산
-    for (let i = 5; i < 20; i++) {
-        sum += freqData[i];
-        count++;
-    }
-    let avg = sum / count;
-
-    // React에 FFT 데이터 전달
-    sendFFTDataToReact(avg);
+    let frequencyValue = analyser.getAverageFrequency(); // ✅ 원본 FFT 값 유지
+    sendFFTDataToReact(frequencyValue); // ✅ 변형 없이 그대로 React로 전송
 }
 
-// 100ms마다 FFT 분석 후 React로 데이터 전송
-setInterval(() => {
-    detectBeat();
-}, 100);
+let fftInterval = null;
+
+function startFFTStreaming() {
+    if (fftInterval) return;  // 이미 실행 중이면 중복 실행 방지
+
+    console.log("🎵 FFT 데이터 스트리밍 시작!");
+    fftInterval = setInterval(() => {
+        if (isPlaying) detectBeat(); // ✅ 음악이 재생 중일 때만 FFT 데이터 전송
+    }, 10); // 조절요소
+}
+
+function stopFFTStreaming() {
+    if (fftInterval) {
+        clearInterval(fftInterval);
+        fftInterval = null;
+        console.log("⏹ FFT 데이터 스트리밍 중지!");
+    }
+}
 
 // Three.js 렌더러 설정
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -297,6 +300,11 @@ function playMusic() {
     isPlaying = true;
     animate();
 
+    startFFTStreaming(); // ✅ 음악 재생 시 FFT 데이터 전송 시작
+
+    // React에 재생 상태 전달
+    window.opener?.postMessage({ type: "musicStatus", status: "playing" }, "*");
+
     playPauseButton.textContent = "Stop";
     playPauseButton.style.backgroundColor = "#dc3545";
     playPauseButton.style.color = "white";
@@ -309,6 +317,11 @@ function pauseMusic() {
     currentPlaybackTime = sound.context.currentTime - audioContextStartTime;
     sound.stop();
     isPlaying = false;
+
+    stopFFTStreaming(); // ✅ 음악 정지 시 FFT 데이터 전송 중단
+
+    // React에 정지 상태 전달
+    window.opener?.postMessage({ type: "musicStatus", status: "paused" }, "*");
 
     playPauseButton.textContent = "Play";
     playPauseButton.style.backgroundColor = "#28a745";
@@ -362,10 +375,17 @@ initialRender();
 // 애니메이션 루프 (재생 중일 때만 실행)
 const clock = new THREE.Clock();
 let animateFrameId;
+// let lastFrameTime = performance.now(); // 🔥 마지막 프레임 시간 저장
 
 function animate() {
     if (!isPlaying) return;
     animateFrameId = requestAnimationFrame(animate);
+
+    // let now = performance.now();
+    // let frameTime = now - lastFrameTime; // 🔥 프레임 간격(ms) 계산
+    // lastFrameTime = now;
+
+    // console.log(`🎨 시각화 애니메이션 업데이트 간격: ${frameTime.toFixed(2)}ms`);
 
     camera.position.x += (mouseX - camera.position.x) * 0.05;
     camera.position.y += (-mouseY - camera.position.y) * 0.5;
@@ -376,7 +396,9 @@ function animate() {
     if (analyser && sound.isPlaying) {
         const frequencyValue = analyser.getAverageFrequency();
         if (frequencyValue > 0) {
-            uniforms.u_frequency.value = frequencyValue;
+            // 조절요소
+            let enhancedValue = Math.pow(frequencyValue / 255, 1.3) * 300; // 기존보다 변화량 증폭
+            uniforms.u_frequency.value = enhancedValue;
         }
     }
 

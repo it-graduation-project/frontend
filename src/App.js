@@ -4,7 +4,7 @@
   - 전체적인 애플리케이션 구조를 담당하며 주요 컴포넌트 포함
   - 네비게이션 바, 파일 업로드, 음악 시각화 기능 연결
   - 로그인 및 회원가입 팝업을 관리하여 인증 처리
-  - FFT 데이터를 수신하여 블루투스를 통해 ESP32에 전송
+  - FFT 데이터를 수신하여 Bluetooth Classic을 통해 ESP32에 전송
 */
 
 import React, { useState, useEffect } from "react";
@@ -19,7 +19,14 @@ import Footer from "./components/Footer";
 import LoginPopup from "./components/LoginPopup";
 import SignupPopup from "./components/SignupPopup";
 import ActionPopup from "./components/ActionPopup";
-import { sendFFTDataToESP32, startStreamingFFTData, stopStreamingFFTData, getBluetoothStatus } from "./utils/bluetoothManager";
+import { 
+  connectBluetoothClassic, 
+  disconnectBluetoothClassic, 
+  sendFFTDataToESP32, 
+  startStreamingFFTData, 
+  stopStreamingFFTData, 
+  getBluetoothStatus 
+} from "./utils/bluetoothManager";
 
 function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false); // 로그인 팝업 상태
@@ -28,7 +35,7 @@ function App() {
   const [audioUrl, setAudioUrl] = useState(null); // 업로드된 음악 URL 상태
   const [popupData, setPopupData] = useState({ isOpen: false });
   const [fileName, setFileName] = useState(null); // 추가
-
+  const [isBluetoothConnected, setIsBluetoothConnected] = useState(false); // ✅ Bluetooth Classic 연결 상태
 
   // 애플리케이션 시작 시 로컬스토리지에서 JWT 토큰 확인
   useEffect(() => {
@@ -36,16 +43,48 @@ function App() {
     if (storedToken) setToken(storedToken);
   }, []);
 
-  // 시각화 창에서 FFT 데이터를 수신하고 블루투스로 전송
+  // ✅ Bluetooth Classic 연결 상태 업데이트
+  useEffect(() => {
+    setIsBluetoothConnected(getBluetoothStatus());
+  }, []);
+
+  // ✅ 블루투스 연결/해제 핸들러
+  const handleBluetoothToggle = async () => {
+    if (isBluetoothConnected) {
+      disconnectBluetoothClassic();
+      setIsBluetoothConnected(false);
+    } else {
+      const success = await connectBluetoothClassic();
+      if (success) setIsBluetoothConnected(true);
+    }
+  };
+
+  // ✅ 시각화 창에서 FFT 데이터를 수신하고 Bluetooth Classic을 통해 ESP32로 전송
   useEffect(() => {
     const handleFFTData = (event) => {
-      if (event.data.type === "fftData" && getBluetoothStatus()) {
-        sendFFTDataToESP32(Math.min(255, Math.floor(event.data.value)));
+      if (event.data.type === "fftData" && isBluetoothConnected) {
+        sendFFTDataToESP32(Math.floor(event.data.value));
       }
     };
     window.addEventListener("message", handleFFTData);
     return () => window.removeEventListener("message", handleFFTData);
-  }, []);
+  }, [isBluetoothConnected]);
+
+  // ✅ 시각화 창에서 음악 재생 상태를 감지하고 FFT 데이터 스트리밍을 제어
+  useEffect(() => {
+    function handleMusicStatus(event) {
+      if (event.data.type === "musicStatus") {
+        if (event.data.status === "playing") {
+          if (isBluetoothConnected) startStreamingFFTData(); // ✅ 음악이 재생되면 FFT 데이터 전송 시작
+        } else if (event.data.status === "paused") {
+          stopStreamingFFTData(); // ✅ 음악이 멈추면 FFT 데이터 전송 중단
+        }
+      }
+    }
+
+    window.addEventListener("message", handleMusicStatus);
+    return () => window.removeEventListener("message", handleMusicStatus);
+  }, [isBluetoothConnected]);
 
   return (
     <div className="App">
@@ -76,16 +115,16 @@ function App() {
       {/* 히어로 섹션 */}
       <Hero />
 
-       {/* How to Start 섹션 */}
-       <HowToStart />
+      {/* ✅ HowToStart에 로그인 상태 전달 */}
+      <HowToStart 
+        onBluetoothToggle={handleBluetoothToggle} 
+        isBluetoothConnected={isBluetoothConnected} 
+      />
 
       {/* 파일 업로드 섹션 */}
       <FileUpload onFileUpload={(url, name) => {
         setAudioUrl(url);
         setFileName(name);
-        if (getBluetoothStatus()) {
-          startStreamingFFTData();
-        }
       }} />
 
       {/* 업로드된 음악이 있으면 시각화 실행 */}
