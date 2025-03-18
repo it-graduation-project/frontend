@@ -22,6 +22,7 @@ const FileUpload = ({ onFileUpload }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const fileInputRef = useRef(null); // 파일 입력 요소 참조
   const intervalRef = useRef(null); 
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const allowedExtensions = new Set(["mp3", "wav", "flac"]);
   const [, forceUpdate] = useState(0);  // 상태 변경을 통한 강제 리렌더링
@@ -145,7 +146,7 @@ const FileUpload = ({ onFileUpload }) => {
 
     try {
       // console.log("🔑 업로드 시 사용할 토큰:", token); 
-      const response = await fetch("http://13.209.19.98:8080/files", {
+      const response = await fetch(`${API_URL}/files`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` },
         body: formData,

@@ -21,11 +21,12 @@ const Navbar = () => {
   const [isLoginPopupOpen, setLoginPopupOpen] = useState(false); // 로그인 팝업 상태
   const [isSignupPopupOpen, setSignupPopupOpen] = useState(false); // 회원가입 팝업 상태
   const [isLogoutPopupOpen, setIsLogoutPopupOpen] = useState(false);
+  const API_URL = process.env.REACT_APP_API_URL;
 
 // 사용자 정보 요청 (JWT 토큰 기반 로그인 유지)
   const fetchUserInfo = async (token) => {
     try {
-      const response = await fetch("http://13.209.19.98:8080/auth/me", {
+      const response = await fetch(`${API_URL}/auth/me`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,

@@ -16,6 +16,7 @@ const SignupPopup = ({ isOpen, onClose, onLoginOpen }) => {
   const [password, setPassword] = useState(""); // 비밀번호 입력 상태
   const [confirmPassword, setConfirmPassword] = useState(""); // 비밀번호 확인 입력 상태
   const [error, setError] = useState(""); // 오류 메시지 상태
+  const API_URL = process.env.REACT_APP_API_URL;
 
   // 팝업이 닫힐 때 입력값 초기화
   useEffect(() => {
@@ -41,7 +42,7 @@ const SignupPopup = ({ isOpen, onClose, onLoginOpen }) => {
     }
 
     try {
-      const response = await fetch("http://13.209.19.98:8080/auth/register", { // AWS 서버 주소 사용
+      const response = await fetch(`${API_URL}/auth/register`, { // AWS 서버 주소 사용
         method: "POST",
         headers: { "Content-Type": "application/json" }, // JSON 형식으로 요청 
         body: JSON.stringify({ email, password, username }), // 회원가입 데이터 전송  

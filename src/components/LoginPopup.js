@@ -14,6 +14,7 @@ const LoginPopup = ({ isOpen, onClose, onSignupOpen, onLoginSuccess }) => {
   const [email, setEmail] = useState(""); // 사용자 이메일 입력 상태
   const [password, setPassword] = useState(""); // 비밀번호 입력 상태
   const [error, setError] = useState(""); // 오류 메시지 상태
+  const API_URL = process.env.REACT_APP_API_URL;
 
   // 팝업이 닫힐 때 입력값 초기화
   useEffect(() => {
@@ -32,7 +33,7 @@ const LoginPopup = ({ isOpen, onClose, onSignupOpen, onLoginSuccess }) => {
     setError(""); // 기존 오류 메시지 초기화
 
     try {
-      const response = await fetch("http://13.209.19.98:8080/auth/login", {  // AWS 서버 주소 사용
+      const response = await fetch(`${API_URL}/auth/login`, {  // AWS 서버 주소 사용
         method: "POST",
         headers: { "Content-Type": "application/json" }, // JSON 형식으로 요청
         body: JSON.stringify({ email, password }), // 이메일과 비밀번호를 JSON 데이터로 전송
