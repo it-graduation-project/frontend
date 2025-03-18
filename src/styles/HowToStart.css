@@ -138,9 +138,8 @@
     opacity: 0.8;
 }
 
-.bluetooth-icon {
-    width: 12px; 
-    height: auto;
+.usb-icon {
+    font-size: 21px;
 }
 
 .music-icon {

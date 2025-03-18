@@ -101,7 +101,7 @@
         startWebcam();
         startGestureRecognition();
 
-        // 🛑 창이 닫힐 때 웹캠 스트림 정리
+        // 창이 닫힐 때 웹캠 스트림 정리
         window.addEventListener("beforeunload", () => {
             if (video.srcObject) {
                 video.srcObject.getTracks().forEach(track => track.stop());
