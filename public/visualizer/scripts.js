@@ -162,8 +162,8 @@ gestureLabel.style.fontWeight = "600";
 
 const gestureCameraIcon = document.createElement("img");
 gestureCameraIcon.src = gestureCameraIconSrc;
-gestureCameraIcon.style.width = "28px";
-gestureCameraIcon.style.height = "28px";
+gestureCameraIcon.style.width = "20px";
+gestureCameraIcon.style.height = "20px";
 
 // 토글 버튼 생성
 const gestureToggleWrapper = document.createElement("label");
@@ -488,8 +488,12 @@ function animate() {
         const frequencyValue = analyser.getAverageFrequency();
         if (frequencyValue > 0) {
             // 조절요소
-            let enhancedValue = Math.pow(frequencyValue / 255, 1.3) * 300; // 기존보다 변화량 증폭
+            let enhancedValue = Math.pow(frequencyValue / 255, 1.3) * 280; // 기존보다 변화량 증폭
             uniforms.u_frequency.value = enhancedValue;
+
+            // 오브젝트 전체 크기도 함께 변화 
+            let scaleFactor = 1 + (frequencyValue / 500); 
+            mesh.scale.lerp(new THREE.Vector3(scaleFactor, scaleFactor, scaleFactor), 0.1);
         }
     }
 
