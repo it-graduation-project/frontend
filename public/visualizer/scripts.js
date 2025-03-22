@@ -303,6 +303,8 @@ playPauseButton.style.display = "flex";
 playPauseButton.style.alignItems = "center";
 playPauseButton.style.justifyContent = "center";
 playPauseButton.style.cursor = "pointer";
+playPauseButton.style.pointerEvents = "none";  // 클릭 비활성화
+playPauseButton.style.opacity = "0.4";         // 흐리게 표시
 
 const playPauseIcon = document.createElement("img");
 playPauseIcon.src = playIconSrc;
@@ -442,6 +444,8 @@ window.onload = async function () {
         console.log("🎛 AudioAnalyser 생성 완료!");
 
         // 버튼 활성화
+        playPauseButton.style.pointerEvents = "auto";
+        playPauseButton.style.opacity = "1.0";
         playPauseButton.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
         playPauseButton.style.borderRadius = "50%";
         playPauseButton.style.display = "flex";
