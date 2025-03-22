@@ -125,7 +125,7 @@ const mat = new THREE.ShaderMaterial({
     fragmentShader: document.getElementById('fragmentshader').textContent
 });
 
-const geo = new THREE.IcosahedronGeometry(4, 30);
+const geo = new THREE.IcosahedronGeometry(3.5, 30);
 const mesh = new THREE.Mesh(geo, mat);
 scene.add(mesh);
 mesh.material.wireframe = true;
@@ -491,30 +491,34 @@ function animate() {
             let enhancedValue = Math.pow(frequencyValue / 255, 1.3) * 280; // 기존보다 변화량 증폭
             uniforms.u_frequency.value = enhancedValue;
 
-            // 오브젝트 전체 크기도 함께 변화 
-            let scaleFactor = 1 + (frequencyValue / 500); 
+            // 오브젝트 전체 크기 변화 
+            let scaleFactor = 1 + (frequencyValue / 300); 
             mesh.scale.lerp(new THREE.Vector3(scaleFactor, scaleFactor, scaleFactor), 0.1);
+
+            // 블룸 효과 변화(0.5 ~ 2.0 범위)
+            let targetStrength = THREE.MathUtils.clamp(frequencyValue / 160, 0.45, 0.622);
+            bloomPass.strength = THREE.MathUtils.lerp(bloomPass.strength, targetStrength, 0.09);
         }
     }
 
     bloomComposer.render();
 }
 
-// 시각화 설정 유지
-const gui = new GUI();
-console.log("📟 GUI 패널 생성 완료");
+// // 시각화 설정 유지
+// const gui = new GUI();
+// console.log("📟 GUI 패널 생성 완료");
 
-// 색상 조절
-const colorsFolder = gui.addFolder('Colors');
-colorsFolder.add(params, 'red', 0, 1).onChange(value => uniforms.u_red.value = Number(value));
-colorsFolder.add(params, 'green', 0, 1).onChange(value => uniforms.u_green.value = Number(value));
-colorsFolder.add(params, 'blue', 0, 1).onChange(value => uniforms.u_blue.value = Number(value));
+// // 색상 조절
+// const colorsFolder = gui.addFolder('Colors');
+// colorsFolder.add(params, 'red', 0, 1).onChange(value => uniforms.u_red.value = Number(value));
+// colorsFolder.add(params, 'green', 0, 1).onChange(value => uniforms.u_green.value = Number(value));
+// colorsFolder.add(params, 'blue', 0, 1).onChange(value => uniforms.u_blue.value = Number(value));
 
-// 블룸 효과 조절
-const bloomFolder = gui.addFolder('Bloom');
-bloomFolder.add(params, 'threshold', 0, 1).onChange(value => bloomPass.threshold = Number(value));
-bloomFolder.add(params, 'strength', 0, 3).onChange(value => bloomPass.strength = Number(value));
-bloomFolder.add(params, 'radius', 0, 1).onChange(value => bloomPass.radius = Number(value));
+// // 블룸 효과 조절
+// const bloomFolder = gui.addFolder('Bloom');
+// bloomFolder.add(params, 'threshold', 0, 1).onChange(value => bloomPass.threshold = Number(value));
+// bloomFolder.add(params, 'strength', 0, 3).onChange(value => bloomPass.strength = Number(value));
+// bloomFolder.add(params, 'radius', 0, 1).onChange(value => bloomPass.radius = Number(value));
 
 // 마우스 이벤트 디버깅
 let mouseX = 0;
