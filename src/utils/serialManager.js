@@ -29,26 +29,31 @@ export const connectSerialDevice  = async () => {
 
     console.log("📡 Checking available Serial devices...");
 
-    // 기존에 연결된 장치 목록 가져오기
-    const ports = await navigator.serial.getPorts();
+    // // 기존에 연결된 장치 목록 가져오기
+    // const ports = await navigator.serial.getPorts();
 
-    // 장치가 아예 없으면 경고 띄우고 종료
-    if (ports.length === 0) {
-      console.error("❌ No serial devices found!");
-      alert("🚨 'RhyFeel' 장치를 찾을 수 없습니다! USB 연결을 확인하세요.");
-      return false;
-    }
+    // // 장치가 아예 없으면 경고 띄우고 종료
+    // if (ports.length === 0) {
+    //   console.error("❌ No serial devices found!");
+    //   alert("🚨 'RhyFeel' 장치를 찾을 수 없습니다! USB 연결을 확인하세요.");
+    //   return false;
+    // }
 
-    // 특정 장치(COM5 USB Serial) 찾기 (VID: 0x1A86, PID: 0x7523)
-    serialPort = ports.find(port => {
-      const info = port.getInfo();
-      return info.usbVendorId === 0x1A86 && info.usbProductId === 0x7523;
+    // // 특정 장치(COM5 USB Serial) 찾기 (VID: 0x1A86, PID: 0x7523)
+    // serialPort = ports.find(port => {
+    //   const info = port.getInfo();
+    //   return info.usbVendorId === 0x1A86 && info.usbProductId === 0x7523;
+    // });
+
+    // 사용자에게 USB 장치 선택창 표시
+    serialPort = await navigator.serial.requestPort({
+      filters: [{ usbVendorId: 0x1A86, usbProductId: 0x7523 }]
     });
 
-    // 특정 장치가 없으면 경고 띄우고 종료
+    // 장치가 없으면 경고 띄우고 종료
     if (!serialPort) {
       console.error("❌ No compatible RhyFeel device found!");
-      alert("🚨 'RhyFeel' 장치를 찾을 수 없습니다! USB 연결을 확인하세요.");
+      alert("🚨 Unable to find the 'RhyFeel' device. Please check your USB connection.");
       return false;
     }
 
