@@ -499,9 +499,9 @@ function animate() {
             let scaleFactor = 1 + (frequencyValue / 300); 
             mesh.scale.lerp(new THREE.Vector3(scaleFactor, scaleFactor, scaleFactor), 0.1);
 
-            // 블룸 효과 변화(0.5 ~ 2.0 범위)
-            let targetStrength = THREE.MathUtils.clamp(frequencyValue / 160, 0.45, 0.622);
-            bloomPass.strength = THREE.MathUtils.lerp(bloomPass.strength, targetStrength, 0.09);
+            // // 블룸 효과 변화(0.5 ~ 2.0 범위)
+            // let targetStrength = THREE.MathUtils.clamp(frequencyValue / 160, 0.45, 0.622);
+            // bloomPass.strength = THREE.MathUtils.lerp(bloomPass.strength, targetStrength, 0.09);
         }
     }
 
