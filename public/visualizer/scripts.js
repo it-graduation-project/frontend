@@ -348,9 +348,9 @@ function pauseMusic() {
     sound.stop();
     isPlaying = false;
 
-    stopFFTStreaming(); // ✅ FFT 데이터 전송 중단
+    stopFFTStreaming(); // FFT 데이터 전송 중단
 
-    // 🎨 버튼을 Play 아이콘으로 변경
+    // 버튼을 Play 아이콘으로 변경
     playPauseIcon.src = playIconSrc;
 
     // React에 정지 상태 전달
