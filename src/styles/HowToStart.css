@@ -1,0 +1,150 @@
+/*
+  HowToStart.css - "How to Start" 섹션 스타일
+  - 서비스 시작 과정 안내  
+  - 블루투스 연결 버튼 포함  
+*/
+
+.how-to-start {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+    padding: 50px 40px; 
+    background: linear-gradient(180deg, #EAEFFF, #ffffff);
+    border-radius: 18px;
+    margin: 50px auto;
+    width: 92%; 
+    max-width: 1250px; 
+    box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.section-title {
+    font-size: 38px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #9333EA 30%, #7A5CEA 50%, #4285F4 70%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    text-align: center;
+    width: 100%; 
+    margin-bottom: 30px; 
+}
+
+.steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px; 
+    flex: 1;
+    min-width: 320px;
+    max-width: 550px; 
+    align-items: center; 
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: white;
+    padding: 14px 28px; 
+    border-radius: 14px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    font-size: 18px;
+    font-weight: bold;
+    color: #374151;
+    min-height: 55px; 
+    width: 100%;
+    position: relative; 
+    padding-left: 20px; 
+}
+
+.step-number {
+    width: 42px; 
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #9333EA 10%, #7A5CEA 40%, #4285F4 90%);
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 22px;
+    flex-shrink: 0;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.step p {
+    text-align: left;
+    line-height: 1.4; 
+    margin: 0;
+    flex: 1;
+    word-break: keep-all;
+    white-space: nowrap;
+}
+
+.connect-box {
+    background: linear-gradient(135deg, #9333EA 10%, #7A5CEA 40%, #4285F4 90%);
+    color: white;
+    padding: 35px; 
+    border-radius: 18px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    flex: 1;
+    min-width: 270px; 
+    max-width: 320px; 
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.connect-box h3 {
+    font-size: 24px; 
+    margin-bottom: 8px;
+}
+
+.connect-box p {
+    font-size: 16px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.connect-btn {
+    background: white;
+    color: #9333EA;
+    font-size: 16px; 
+    font-weight: bold;
+    border: none;
+    padding: 16px 22px; 
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; 
+    transition: transform 0.2s
+}
+
+.connect-btn:hover {
+    transform: scale(1.05);
+}
+
+.small-text {
+    font-size: 13px; 
+    margin-top: 25px; 
+    opacity: 0.8;
+}
+
+.usb-icon {
+    font-size: 21px;
+}
+
+.music-icon {
+    width: 30px; 
+    height: auto;
+    margin-bottom: 3px;
+}
+

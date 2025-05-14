@@ -1,39 +1,28 @@
 /*
   Hero.js - 히어로 섹션 컴포넌트
-  - 사용자에게 사이트의 주요 기능을 소개
-  - 업로드 버튼을 통해 음악 파일 업로드 기능과 연결
+  -------------------------------------------------
+  - 사용자가 웹사이트에 처음 방문했을 때 가장 먼저 보는 핵심 섹션
+  - "Vision and Touch"를 강조하며, 음악을 시각적/촉각적으로 경험하는 컨셉 전달
+  - 배경 그래픽 및 소개 텍스트 포함
 */
 
 import React from "react";
 import "../styles/Hero.css";
 import waveImage from "../images/wave.png";
-import musicIconImage from "../images/music-icon.png";
 
-const Hero = ({ onFileUpload }) => {
+const Hero = () => {
   return (
     <section className="hero-section">
       <div className="hero-content">
-        <h1>Experience Music Through Sight and Touch</h1>
+        <h1>
+          Feel the Music through <br /> 
+          <span className="highlight-text">Eyes and Hands</span> 
+        </h1>
         <p>
-          Transform music into visual and tactile experiences. Our innovative
-          technology helps the deaf community experience music in a whole new way.
+          RhyFeel is an innovative music experience platform that 
+          transforms music into visual and tactile sensations, making 
+          music accessible to everyone, including the hearing-impaired community. 
         </p>
-        <button className="upload-btn" onClick={() => document.getElementById("heroFileInput").click()}>
-          <img src={musicIconImage} alt="Music Icon" className="music-icon" />
-          Upload Music
-        </button>
-        <input
-          type="file"
-          id="heroFileInput"  
-          style={{ display: "none" }}
-          accept=".mp3,.wav,.flac"
-          onClick={(e) => (e.target.value = null)} // 클릭할 때 값 초기화
-          onChange={(e) => {
-            if (e.target.files.length === 0) return;
-            console.log("🔵 Hero.js - 파일 선택됨:", e.target.files[0]);
-            onFileUpload(e.target.files[0]);
-          }}
-        />
       </div>
       <img src={waveImage} alt="Wave Graphic" className="wave-graphic" />
     </section>

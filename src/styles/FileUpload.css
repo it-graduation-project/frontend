@@ -1,16 +1,16 @@
 /*
-  fileUpload.css - 파일 업로드 및 특징 설명 섹션 스타일
-  - 파일 업로드 기능과 음악 시각화 관련 설명을 포함
+  FileUpload.css - 파일 업로드 섹션 스타일
+  - 음악 파일 업로드 UI 스타일 정의
 */
 
 .upload-section {
   text-align: center;
-  padding: 40px 20px;
-  background-color: #f9f9f9;
+  padding: 20px 20px;
+  margin-bottom: 25px;
 }
 
 .upload-section h2 {
-  font-size: 30px;
+  font-size: 38px;
   margin-bottom: 10px;
 }
 
@@ -21,38 +21,39 @@
 
 .upload-box {
   border: 2px dashed #ccc;
-  border-radius: 8px;
+  border-radius: 16px;
   padding: 20px;
   margin: 0 auto 40px auto;
   width: 50%;
   max-width: 600px;
-  background-color: #ffffff;
-  transition: border-color 0.3s, background-color 0.3s;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F3F4F6 100%);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
-/* 드래그앤드롭 박스 효과 */
+/* 드래그 오버 효과 */
 .upload-box.drag-over {
-  border-color: #0073e6;
-  background-color: #f0faff;
+  border-color: #9333EA; 
+  background: linear-gradient(180deg, #FFFFFF 0%, #EEF2FF 100%); 
+  box-shadow: 0px 6px 12px rgba(79, 70, 229, 0.15);
+  transform: translateY(-2px); 
 }
 
 .upload-icon {
-  width: 40px;
-  margin-bottom: 10px;
+  width: 35px;
 }
 
-.browse-btn {
+.browse-btn, .upload-new-btn {
   padding: 15px 30px;
-  background-color: #000000;
+  background: linear-gradient(135deg, #9333EA 10%, #7A5CEA 40%, #4285F4 90%);
   color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 9999px;
   cursor: pointer;
   transition: transform 0.2s, background-color 0.2s;
 }
 
-.browse-btn:hover {
-  background-color: #333333;
+.browse-btn:hover, .upload-new-btn:hover {
   transform: scale(1.05);
 }
 
@@ -61,34 +62,39 @@
   color: #6c6c6c;
 }
 
-.feature-cards {
+/* 체크 아이콘 원형 배경 (연한 보라색 추가) */
+.check-icon-container {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(147, 51, 234, 0.1); /* 연한 보라색 배경 */
+  border-radius: 50%;
   display: flex;
-  justify-content: space-around;
-  gap: 10px;
-  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
 }
 
-.feature-card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 20px;
-  max-width: 360px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  text-align: center;
+/* 체크 아이콘 크기 */
+.check-icon {
+  width: 24px;  /* 적당한 크기로 조정 */
+  height: 24px;
+  animation: bounceIn 0.6s ease-out;
 }
 
-.feature-icon {
-  width: 30px;
-  height: 34px;
-  margin-bottom: 10px;
+/* 애니메이션 */
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.feature-card h3 {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
 
-.feature-card p {
-  font-size: 14px;
-  color: #6c6c6c;
-}

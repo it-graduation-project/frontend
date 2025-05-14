@@ -11,6 +11,21 @@
 # production
 /build
 
+# env
+.env
+
+# log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# editor-specific files
+.idea/    
+.vscode/  
+
+# OS-specific files
+Thumbs.db 
+
 # misc
 .DS_Store
 .env.local

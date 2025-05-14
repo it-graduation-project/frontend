@@ -1,13 +1,13 @@
 /*
-  hero.css - 히어로 섹션 스타일
-  - 웹사이트 첫 화면의 주요 메시지를 강조하는 섹션
+  Hero.css - 히어로 섹션 스타일
+  - 웹사이트 첫 화면의 핵심 메시지를 강조하는 섹션
 */
 
 .hero-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 40px 20px;
+  padding: 40px 40px;
   background-color: #ffffff;
   flex-wrap: wrap;
 }
@@ -18,14 +18,24 @@
 }
 
 .hero-content h1 {
-  font-size: 50px;
-  margin-bottom: 20px;
+  font-size: 60px; 
+  margin-bottom: 30px;
+  line-height: 1; 
 }
 
 .hero-content p {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 21px;
   color: #6c6c6c;
+  line-height: 1.4;
+}
+
+.hero-content .highlight-text {  
+  background: linear-gradient(135deg, #9333EA 10%, #7A5CEA 40%, #4285F4 90%);
+  background-clip: text;
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+  color: transparent; 
+  font-weight: bold;
 }
 
 .upload-btn {
@@ -53,7 +63,7 @@
 
 .wave-graphic {
   flex: 1;
-  max-width: 600px;
+  max-width: 650px;
   width: 100%;
-  border-radius: 0;
+  border-radius: 20px;
 }
