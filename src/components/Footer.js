@@ -15,7 +15,7 @@ const Footer = () => {
         <p>Experience music beyond sound. A multi-sensory platform that lets you feel every beat.</p>
         
         <div className="footer-links">
-          <a href="https://github.com/it-graduation-project" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/it-graduation-project/overview" target="_blank" rel="noopener noreferrer">
             <FaGithub className="footer-icon" /> GitHub
           </a>
           <a href="mailto:daninld@sookmyung.ac.kr">
