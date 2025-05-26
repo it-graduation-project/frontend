@@ -1,105 +1,78 @@
-## **1. 브랜치 구조**
+# 🎵 RhyFeel - 청각 없이도 음악을 '경험'하는 법
 
-| 브랜치 유형 | 브랜치 이름 예시 | 설명 |
-| --- | --- | --- |
-| **메인 (배포)** | `main` | 🚀 최종 배포 브랜치 (직접 작업 금지) |
-| **개발 (통합)** | `dev` | 🛠 기능 개발이 모이는 브랜치 |
-| **기능 개발** | `feature/기능명` | 각자 개발할 기능별 브랜치 (예: `feature/login`) |
-| **버그 수정** | `fix/버그명` | 특정 버그 수정 브랜치 (예: `fix/upload-error`) |
+> 청각장애인을 위한 멀티모달 음악 번역 플랫폼  
+> 음악의 **리듬과 비트**를 시각과 촉각으로 동기화해 체험할 수 있도록 설계했습니다.
 
-✅ **기능 개발은 `dev`에서 새로운 브랜치를 만들어 진행**
-
-✅ 기능이 완성되면 **PR(Pull Request) 생성 후 `dev`에 머지**
+![RhyFeel 포스터](./assets/poster.png)
 
 ---
 
-## **2. 브랜치 생성 및 작업 흐름**
+## 🧠 Why RhyFeel?
 
-### 📌 **기능 개발 시 브랜치 생성**
-
-```bash
-git checkout dev  # 항상 dev에서 브랜치를 만든다
-git pull origin dev  # 최신 코드 가져오기
-git checkout -b feature/기능명  # 새 기능 브랜치 생성
-```
-
-### 🛠 **코드 수정 & 커밋**
-
-```bash
-git add .
-git commit -m "Feat: 기능 추가 설명"
-```
-
-### 🚀 **원격 저장소에 푸시**
-
-```bash
-git push origin feature/기능명
-```
-
-### ✅ **PR(Pull Request) 생성 후 코드 리뷰**
-
-- GitHub에서 `feature/기능명` → `dev`로 **PR 생성**
-- 팀원 코드 리뷰 후 `dev` 브랜치로 머지
-
-### 🔄 **다음 기능 개발 시, `dev` 브랜치 최신 코드 가져오기**
-
-```bash
-git checkout dev
-git pull origin dev
-```
+청각장애인은 여전히 음악 감상에서 소외되어 있습니다.  
+RhyFeel은 소리를 ‘보게’ 하고, ‘느끼게’ 함으로써  
+**음악의 감각적 접근성**을 실현하는 실험적 플랫폼입니다.
 
 ---
 
-## **3. 충돌 방지 및 해결 방법**
+## ⚙️ What It Does
 
-### **🚨 같은 파일을 여러 명이 수정하면 충돌 가능 → 충돌 방법**
+- 🎧 **실시간 주파수 분석**  
+  - 10ms 단위 음악 분석 (Web Audio API 기반 FFT)
 
-1️⃣ **작업 전 최신 코드 가져오기**
+- 🎨 **3D 시각화**  
+  - 음악 리듬에 따라 실시간으로 형태 변화 (Three.js + Shader)
 
-```bash
-git checkout dev
-git pull origin dev
-```
+- 🤝 **손목 진동 피드백**  
+  - 진동 모터 4개가 음악 강약에 맞춰 즉각 반응 (ESP32 + Web Serial)
 
-2️⃣ **충돌 가능성이 있는 파일을 조심해서 작업**
+- ✋ **제스처 기반 제어**  
+  - 손 펼치면 재생, 주먹 쥐면 정지 (MediaPipe Hands 활용)
 
-3️⃣ **PR을 만들기 전에 `dev` 최신 코드 반영**
+- 💡 **웹에서 즉시 실행**  
+  - 설치 없이, 브라우저에서 바로 체험 가능 → [rhyfeel.site](https://rhyfeel.site)
 
-```bash
-git checkout feature/기능명
-git merge dev  # dev 브랜치 최신 코드 가져오기
-```
+---
 
-4️⃣ **충돌 발생 시 직접 해결 후 커밋 & 푸시**
+## 🧩 How It Works
 
-```bash
-git add .
-git commit -m "Fix: 충돌 해결"
-git push origin feature/기능명
+```mermaid
+graph TD
+A[🎵 음악 업로드] --> B[🔍 주파수 분석 (10ms)]
+B --> C1[🎨 시각화 (Three.js)]
+B --> C2[🤝 진동 출력 (Web Serial → ESP32)]
+C1 --> D[🖼️ 화면에 3D 오브젝트 출력]
+C2 --> E[🌀 손목 진동 실시간 출력]
+F[✋ 손동작 제어] --> G[⏯️ 재생/정지 제어]
 ```
 
 ---
 
-## **4. 최종 배포 (dev → main)**
+## 🌐 기술 스택 요약
 
-모든 기능이 `dev`에 머지되었으면, 테스트 후 `main`에 반영합니다.
-
-```bash
-git checkout main
-git merge dev  # dev 브랜치의 변경 사항을 main에 적용
-git push origin main
-```
+| 구분 | 기술 |
+|------|------|
+| Frontend | React, Three.js, Web Audio API, MediaPipe |
+| Backend | Spring Boot, MySQL, AWS EC2 |
+| 하드웨어 | ESP32, L9110S 모터드라이버, 진동 모터 4개 |
+| 통신 방식 | Web Serial API (USB 기반 실시간 전송) |
 
 ---
 
-## **🎯 최종 정리 (Git 브랜치 전략)**
+## 🙌 핵심 가치
 
-✅ `main` - **배포용 (절대 직접 작업 X)**
+- **청각장애인의 음악 감상 접근성 향상**
+- **시각 + 촉각 통합**으로 몰입형 감각 경험 제공
+- **하드웨어 + 웹의 경량화 통합 시스템**
+- **누구나 어디서든 체험 가능한 보편적 UX**
 
-✅ `dev` - **개발용 (모든 기능 브랜치를 머지)**
+---
 
-✅ `feature/기능명` - **각자 기능 개발 (완성되면 `dev`로 PR)**
+## 🔗 웹사이트
 
-✅ `fix/버그명` - **버그 수정 (완성되면 `dev`로 PR)**
+👉 [https://rhyfeel.site](https://rhyfeel.site)
 
-📢 **⚠️ 주의: `main`에서 직접 작업하지 말고, 항상 `dev`에서 새 브랜치를 만들 것!**
+> USB로 디바이스 연결 후, 음악 파일을 업로드해보세요.  
+> 음악이 눈으로, 손목으로 ‘들립니다’.
+
+---
